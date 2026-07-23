@@ -1,0 +1,19 @@
+[project]
+name = "capiso-backend"
+version = "0.1.0"
+description = "FastAPI backend foundation for CapISO"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.116.0,<0.117.0",
+    "uvicorn[standard]>=0.35.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.0,<9.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
