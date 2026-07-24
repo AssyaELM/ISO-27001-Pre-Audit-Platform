@@ -46,3 +46,12 @@ CapISO/
 - Modele de donnees MVP : `docs/DATA_MODEL_MVP.md`
 - Mockups officiels : `docs/mockups/`
 
+## Developpement local
+
+PostgreSQL peut etre lance seul pour le developpement local :
+
+```bash
+docker compose up -d postgres
+```
+
+Le backend reste lance depuis `backend/` avec `uv run uvicorn app.main:app --reload`.

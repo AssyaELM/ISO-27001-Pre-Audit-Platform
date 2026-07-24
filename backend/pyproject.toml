@@ -5,7 +5,11 @@ description = "FastAPI backend foundation for CapISO"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "alembic>=1.17.0",
     "fastapi>=0.116.0,<0.117.0",
+    "psycopg[binary]>=3.2.0",
+    "pydantic-settings>=2.7.0",
+    "sqlalchemy>=2.0.0",
     "uvicorn[standard]>=0.35.0",
 ]
 

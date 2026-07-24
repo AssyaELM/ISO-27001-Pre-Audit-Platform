@@ -2,13 +2,46 @@
 
 FastAPI backend foundation for CapISO.
 
-This first backend step only exposes a health endpoint and the extensible API structure. It does not configure PostgreSQL, Alembic, authentication, ISO business modules, or AI features.
+This backend foundation exposes the health endpoint and configures the PostgreSQL persistence foundation with SQLAlchemy 2.x and Alembic.
+
+No business tables exist yet. User, organization, authentication, ISO, and AI features are intentionally not implemented in this step.
+
+## Dependencies
+
+- FastAPI
+- Uvicorn
+- SQLAlchemy 2.x
+- psycopg 3
+- pydantic-settings
+- Alembic
+- Pytest
 
 ## Install
 
 ```bash
 uv sync
 ```
+
+## Configuration
+
+Copy the root `.env.example` to `.env` for local development and adjust only development values.
+
+```bash
+DATABASE_URL=postgresql+psycopg://capiso:change-me@localhost:5432/capiso
+DATABASE_ECHO=false
+```
+
+Never commit a real `.env` file.
+
+## PostgreSQL
+
+From the repository root:
+
+```bash
+docker compose up -d postgres
+```
+
+The compose file starts only PostgreSQL for local development.
 
 ## Run
 
@@ -39,3 +72,19 @@ Expected response:
 uv run pytest
 ```
 
+Some health endpoint tests start a local Uvicorn process and require local socket access.
+
+## Alembic
+
+Alembic is configured, but no business migration exists yet.
+
+Useful commands from `backend/`:
+
+```bash
+uv run alembic current
+uv run alembic check
+uv run alembic revision --autogenerate -m "message"
+uv run alembic upgrade head
+```
+
+Do not create an empty revision. The first business migration will be created when the initial User, Organization, and OrganizationMember models are added.
