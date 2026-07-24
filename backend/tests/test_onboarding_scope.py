@@ -2,6 +2,7 @@ import uuid
 
 import pytest
 from fastapi import HTTPException
+from fastapi.testclient import TestClient
 from pydantic import ValidationError
 from sqlalchemy import delete, select, text
 from sqlalchemy.exc import SQLAlchemyError
@@ -28,6 +29,7 @@ from app.api.routes.scopes import (
 )
 from app.core.security import get_password_hash
 from app.db.session import SessionLocal, engine
+from app.main import app
 from app.models.onboarding import (
     OnboardingSession,
     OrganizationExternalRequirement,
@@ -56,6 +58,7 @@ from app.services.scope import (
     review_scope,
     update_scope_element,
 )
+from app.core.security import create_access_token
 
 
 pytestmark = pytest.mark.integration
@@ -422,3 +425,118 @@ def test_scope_review_blocks_missing_boundaries_and_exclusion_without_reason(
     with pytest.raises(HTTPException) as exc_info:
         update_scope_element(db_session, scope, element, "exclude", " ")
     assert exc_info.value.status_code == 422
+
+
+def test_authenticated_http_api_completes_onboarding_and_scope_workflow(
+    db_session,
+) -> None:
+    admin = _access(db_session, "http")
+    headers = {
+        "Authorization": f"Bearer {create_access_token(str(admin.user.id))}"
+    }
+    base = f"/api/v1/organizations/{admin.organization.id}"
+
+    with TestClient(app) as client:
+        catalog = client.get("/api/v1/onboarding/catalog", headers=headers)
+        assert catalog.status_code == 200
+        assert catalog.json()["schema_version"] == "1.0"
+
+        started = client.post(f"{base}/onboarding", headers=headers)
+        assert started.status_code == 201
+        onboarding_id = started.json()["id"]
+
+        step_1 = client.put(
+            f"{base}/onboarding/steps/1",
+            headers=headers,
+            json=_step_1().model_dump(mode="json"),
+        )
+        step_2 = client.put(
+            f"{base}/onboarding/steps/2",
+            headers=headers,
+            json=_step_2().model_dump(mode="json"),
+        )
+        step_3 = client.put(
+            f"{base}/onboarding/steps/3",
+            headers=headers,
+            json=_step_3().model_dump(mode="json"),
+        )
+        assert [step_1.status_code, step_2.status_code, step_3.status_code] == [
+            200,
+            200,
+            200,
+        ]
+
+        reviewed = client.post(f"{base}/onboarding/review", headers=headers)
+        assert reviewed.status_code == 200
+        assert reviewed.json()["blocking_errors"] == []
+
+        submitted = client.post(f"{base}/onboarding/submit", headers=headers)
+        validated = client.post(f"{base}/onboarding/validate", headers=headers)
+        assert submitted.status_code == 200
+        assert validated.status_code == 200
+        assert validated.json()["session"]["status"] == "validated"
+
+        generated = client.post(
+            f"{base}/scopes/from-onboarding",
+            headers=headers,
+            json={
+                "onboarding_session_id": onboarding_id,
+                "name": "Périmètre HTTP",
+            },
+        )
+        assert generated.status_code == 201
+        scope = generated.json()
+        scope_id = scope["id"]
+        assert scope["status"] == "draft"
+        assert scope["elements"]
+
+        for element in scope["elements"]:
+            response = client.patch(
+                f"{base}/scopes/{scope_id}/elements/{element['id']}",
+                headers=headers,
+                json={"user_decision": "include", "justification": None},
+            )
+            assert response.status_code == 200
+
+        clarifications = client.get(
+            f"{base}/scopes/{scope_id}/clarifications", headers=headers
+        )
+        assert clarifications.status_code == 200
+        for clarification in clarifications.json():
+            response = client.patch(
+                f"{base}/scopes/{scope_id}/clarifications/{clarification['id']}",
+                headers=headers,
+                json={
+                    "status": "resolved",
+                    "resolution_comment": "Inclusion confirmée pendant le test HTTP.",
+                },
+            )
+            assert response.status_code == 200
+
+        scope_review = client.post(
+            f"{base}/scopes/{scope_id}/review", headers=headers
+        )
+        assert scope_review.status_code == 200
+        assert scope_review.json()["blocking_errors"] == []
+
+        scope_submit = client.post(
+            f"{base}/scopes/{scope_id}/submit", headers=headers
+        )
+        scope_validate = client.post(
+            f"{base}/scopes/{scope_id}/validate", headers=headers
+        )
+        assert scope_submit.status_code == 200
+        assert scope_validate.status_code == 200
+        assert scope_validate.json()["status"] == "validated"
+
+        immutable = client.patch(
+            f"{base}/scopes/{scope_id}",
+            headers=headers,
+            json={"name": "Modification interdite"},
+        )
+        revised = client.post(
+            f"{base}/scopes/{scope_id}/revise", headers=headers
+        )
+        assert immutable.status_code == 409
+        assert revised.status_code == 201
+        assert revised.json()["version"] == 2
