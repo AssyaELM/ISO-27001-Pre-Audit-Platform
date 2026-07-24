@@ -27,7 +27,7 @@ uv sync
 Copy the root `.env.example` to `.env` for local development and adjust only development values.
 
 ```bash
-DATABASE_URL=postgresql+psycopg://capiso:change-me@localhost:5432/capiso
+DATABASE_URL=postgresql+psycopg://capiso:change-me@localhost:5433/capiso
 DATABASE_ECHO=false
 ```
 
@@ -42,6 +42,7 @@ docker compose up -d postgres
 ```
 
 The compose file starts only PostgreSQL for local development.
+It exposes PostgreSQL on `127.0.0.1:5433` to avoid conflicts with another local PostgreSQL using `5432`.
 
 ## Run
 

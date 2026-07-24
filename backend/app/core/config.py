@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     api_v1_prefix: str = "/api/v1"
     database_url: str = Field(
-        default="postgresql+psycopg://capiso:change-me@localhost:5432/capiso",
+        default="postgresql+psycopg://capiso:change-me@localhost:5433/capiso",
         repr=False,
     )
     database_echo: bool = False

@@ -4,13 +4,13 @@ from app.core.config import Settings
 def test_database_url_loads_from_environment(monkeypatch) -> None:
     monkeypatch.setenv(
         "DATABASE_URL",
-        "postgresql+psycopg://capiso:example@localhost:5432/capiso_test",
+        "postgresql+psycopg://capiso:example@localhost:5433/capiso_test",
     )
 
     settings = Settings()
 
     assert settings.database_url == (
-        "postgresql+psycopg://capiso:example@localhost:5432/capiso_test"
+        "postgresql+psycopg://capiso:example@localhost:5433/capiso_test"
     )
 
 
@@ -28,4 +28,3 @@ def test_settings_keep_existing_application_defaults() -> None:
     assert settings.app_name == "CapISO API"
     assert settings.service_name == "capiso-api"
     assert settings.api_v1_prefix == "/api/v1"
-
