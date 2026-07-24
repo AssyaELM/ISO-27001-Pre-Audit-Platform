@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 
@@ -50,18 +51,21 @@ def test_get_session_closes_session(monkeypatch) -> None:
     assert closed["value"] is True
 
 
-def test_importing_app_does_not_import_database_session() -> None:
+def test_importing_app_does_not_open_database_connection() -> None:
+    env = os.environ.copy()
+    env["DATABASE_URL"] = "postgresql+psycopg://capiso:bad@127.0.0.1:1/capiso"
+
     result = subprocess.run(
         [
             sys.executable,
             "-c",
             (
-                "import sys; "
                 "import app.main; "
-                "raise SystemExit(0 if 'app.db.session' not in sys.modules else 1)"
+                "raise SystemExit(0)"
             ),
         ],
         check=False,
+        env=env,
     )
 
     assert result.returncode == 0

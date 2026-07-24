@@ -20,7 +20,10 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     service_name: str = "capiso-api"
     app_env: str = "development"
+    app_secret_key: str = Field(default="change-me-change-me-change-me-change-me", repr=False)
     api_v1_prefix: str = "/api/v1"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60
     database_url: str = Field(
         default="postgresql+psycopg://capiso:change-me@localhost:5433/capiso",
         repr=False,

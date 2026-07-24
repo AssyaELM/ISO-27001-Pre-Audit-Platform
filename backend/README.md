@@ -14,6 +14,9 @@ The initial identity tables exist for users, organizations, and organization mem
 - psycopg 3
 - pydantic-settings
 - Alembic
+- pwdlib with Argon2
+- PyJWT
+- email-validator
 - Pytest
 
 ## Install
@@ -66,6 +69,19 @@ Expected response:
   "service": "capiso-api"
 }
 ```
+
+## Authentication
+
+The initial authentication endpoints are:
+
+```text
+POST /api/v1/auth/register
+POST /api/v1/auth/login
+GET /api/v1/auth/me
+```
+
+Emails are normalized before storage with `email.strip().lower()`.
+Plain-text passwords must never be stored, returned in API responses, or written to logs.
 
 ## Test
 
