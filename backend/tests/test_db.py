@@ -3,12 +3,17 @@ import sys
 
 from sqlalchemy.orm import Session
 
+import app.models
 from app.db.base import Base
 
 
 def test_base_metadata_exists() -> None:
     assert Base.metadata is not None
-    assert Base.metadata.tables == {}
+    assert set(Base.metadata.tables) == {
+        "organization_members",
+        "organizations",
+        "users",
+    }
 
 
 def test_session_factory_is_configured() -> None:

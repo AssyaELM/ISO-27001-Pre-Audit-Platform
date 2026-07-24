@@ -4,7 +4,7 @@ FastAPI backend foundation for CapISO.
 
 This backend foundation exposes the health endpoint and configures the PostgreSQL persistence foundation with SQLAlchemy 2.x and Alembic.
 
-No business tables exist yet. User, organization, authentication, ISO, and AI features are intentionally not implemented in this step.
+The initial identity tables exist for users, organizations, and organization memberships. Authentication, ISO, frontend, and AI features are intentionally not implemented yet.
 
 ## Dependencies
 
@@ -77,7 +77,7 @@ Some health endpoint tests start a local Uvicorn process and require local socke
 
 ## Alembic
 
-Alembic is configured, but no business migration exists yet.
+Alembic is configured with the first identity migration.
 
 Useful commands from `backend/`:
 
@@ -87,5 +87,3 @@ uv run alembic check
 uv run alembic revision --autogenerate -m "message"
 uv run alembic upgrade head
 ```
-
-Do not create an empty revision. The first business migration will be created when the initial User, Organization, and OrganizationMember models are added.
