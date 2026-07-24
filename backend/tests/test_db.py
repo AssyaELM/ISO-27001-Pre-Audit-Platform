@@ -12,8 +12,21 @@ def test_base_metadata_exists() -> None:
     assert Base.metadata is not None
     assert set(Base.metadata.tables) == {
         "email_verification_tokens",
+        "isms_scopes",
+        "onboarding_sessions",
+        "organization_activities",
+        "organization_data_categories",
+        "organization_external_requirements",
         "organization_members",
+        "organization_processes",
+        "organization_profiles",
+        "organization_sites",
+        "organization_suppliers",
+        "organization_systems",
+        "organization_teams",
         "organizations",
+        "scope_clarifications",
+        "scope_elements",
         "users",
     }
 

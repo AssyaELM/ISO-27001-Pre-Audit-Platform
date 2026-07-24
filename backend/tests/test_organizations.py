@@ -41,9 +41,18 @@ def db_session():
 
 
 def _cleanup(session) -> None:
-    session.execute(delete(OrganizationMember).where(OrganizationMember.role == ADMIN_ROLE))
-    session.execute(delete(Organization).where(Organization.slug.like("org-test-%")))
-    session.execute(delete(User).where(User.email.like("org-test-%@example.com")))
+    organization_ids = select(Organization.id).where(
+        Organization.slug.like("org-test-%")
+    )
+    user_ids = select(User.id).where(User.email.like("org-test-%@example.com"))
+    session.execute(
+        delete(OrganizationMember).where(
+            (OrganizationMember.organization_id.in_(organization_ids))
+            | (OrganizationMember.user_id.in_(user_ids))
+        )
+    )
+    session.execute(delete(Organization).where(Organization.id.in_(organization_ids)))
+    session.execute(delete(User).where(User.id.in_(user_ids)))
     session.commit()
 
 
