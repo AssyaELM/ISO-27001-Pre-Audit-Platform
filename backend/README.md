@@ -83,6 +83,18 @@ GET /api/v1/auth/me
 Emails are normalized before storage with `email.strip().lower()`.
 Plain-text passwords must never be stored, returned in API responses, or written to logs.
 
+## Organizations
+
+The initial organization endpoints are:
+
+```text
+POST /api/v1/organizations
+GET /api/v1/organizations
+GET /api/v1/organizations/{organization_id}
+```
+
+Creating an organization also creates the creator's `organization_members` row with the `administrateur_entreprise` role. Both writes are committed in a single transaction. If either write fails, the transaction is rolled back.
+
 ## Test
 
 ```bash
