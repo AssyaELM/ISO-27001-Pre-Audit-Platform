@@ -23,6 +23,10 @@ class OrganizationMember(Base):
             ")",
             name="ck_organization_members_role",
         ),
+        CheckConstraint(
+            "status IN ('pending', 'active', 'disabled')",
+            name="ck_organization_members_status",
+        ),
         UniqueConstraint("organization_id", "user_id", name="uq_organization_members_org_user"),
     )
 
@@ -38,6 +42,12 @@ class OrganizationMember(Base):
         index=True,
     )
     role: Mapped[str] = mapped_column(String(50), nullable=False)
+    status: Mapped[str] = mapped_column(
+        String(40),
+        nullable=False,
+        default="active",
+        server_default="active",
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

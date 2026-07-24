@@ -1,13 +1,14 @@
 from sqlalchemy import CheckConstraint, UniqueConstraint
 
 from app.db.base import Base
-from app.models import Organization, OrganizationMember, User
+from app.models import EmailVerificationToken, Organization, OrganizationMember, User
 
 
 def test_identity_models_are_registered() -> None:
     assert User.__table__ is Base.metadata.tables["users"]
     assert Organization.__table__ is Base.metadata.tables["organizations"]
     assert OrganizationMember.__table__ is Base.metadata.tables["organization_members"]
+    assert EmailVerificationToken.__table__ is Base.metadata.tables["email_verification_tokens"]
 
 
 def test_user_table_has_required_auth_columns() -> None:
@@ -20,6 +21,9 @@ def test_user_table_has_required_auth_columns() -> None:
     assert columns["password_hash"].nullable is False
     assert columns["is_active"].nullable is False
     assert columns["is_active"].server_default is not None
+    assert columns["is_verified"].nullable is False
+    assert columns["is_verified"].server_default is not None
+    assert "email_verified_at" in columns
 
 
 def test_organization_member_has_org_user_uniqueness() -> None:
@@ -40,3 +44,22 @@ def test_organization_member_role_is_constrained() -> None:
     }
 
     assert "ck_organization_members_role" in constraints
+    assert "ck_organization_members_status" in constraints
+
+
+def test_email_verification_token_has_required_columns() -> None:
+    columns = EmailVerificationToken.__table__.columns
+
+    assert {
+        "id",
+        "user_id",
+        "organization_id",
+        "membership_id",
+        "token_hash",
+        "expires_at",
+        "used_at",
+        "invalidated_at",
+        "created_at",
+    }.issubset(columns.keys())
+    assert columns["token_hash"].nullable is False
+    assert columns["expires_at"].nullable is False

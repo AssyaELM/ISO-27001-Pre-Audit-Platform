@@ -11,6 +11,7 @@ from app.db.base import Base
 def test_base_metadata_exists() -> None:
     assert Base.metadata is not None
     assert set(Base.metadata.tables) == {
+        "email_verification_tokens",
         "organization_members",
         "organizations",
         "users",

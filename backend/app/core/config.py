@@ -30,6 +30,15 @@ class Settings(BaseSettings):
     )
     database_echo: bool = False
     testing: bool = False
+    frontend_url: str = "http://localhost:5173"
+    email_from: str = "no-reply@capiso.local"
+    email_verification_expire_hours: int = 24
+    email_resend_cooldown_seconds: int = 60
+    smtp_host: str | None = None
+    smtp_port: int = 587
+    smtp_username: str | None = Field(default=None, repr=False)
+    smtp_password: str | None = Field(default=None, repr=False)
+    smtp_use_tls: bool = True
 
 
 @lru_cache

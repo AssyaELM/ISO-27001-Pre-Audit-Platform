@@ -10,6 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
 
 if TYPE_CHECKING:
+    from app.models.email_verification_token import EmailVerificationToken
     from app.models.organization_member import OrganizationMember
 
 
@@ -33,6 +34,13 @@ class User(Base):
         default=False,
         server_default=false(),
     )
+    is_verified: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=false(),
+    )
+    email_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -46,6 +54,10 @@ class User(Base):
     )
 
     memberships: Mapped[list[OrganizationMember]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    email_verification_tokens: Mapped[list[EmailVerificationToken]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )

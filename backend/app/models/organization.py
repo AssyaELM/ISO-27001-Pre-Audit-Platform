@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, String, Text, func
+from sqlalchemy import CheckConstraint, DateTime, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -15,6 +15,12 @@ if TYPE_CHECKING:
 
 class Organization(Base):
     __tablename__ = "organizations"
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('pending_activation', 'active', 'archived')",
+            name="ck_organizations_status",
+        ),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -22,6 +28,12 @@ class Organization(Base):
     sector: Mapped[str | None] = mapped_column(String(120))
     size_range: Mapped[str | None] = mapped_column(String(80))
     country: Mapped[str | None] = mapped_column(String(120))
+    status: Mapped[str] = mapped_column(
+        String(40),
+        nullable=False,
+        default="active",
+        server_default="active",
+    )
     language: Mapped[str] = mapped_column(String(20), nullable=False, default="fr")
     timezone: Mapped[str] = mapped_column(
         String(80),

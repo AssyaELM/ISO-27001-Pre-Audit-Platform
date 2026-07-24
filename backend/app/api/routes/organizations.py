@@ -6,7 +6,12 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.api.routes.auth import get_current_user
+from app.api.routes.auth import (
+    ADMIN_ROLE,
+    MEMBERSHIP_STATUS_ACTIVE,
+    ORG_STATUS_ACTIVE,
+    get_current_user,
+)
 from app.db.session import get_session
 from app.models.organization import Organization
 from app.models.organization_member import OrganizationMember
@@ -15,7 +20,6 @@ from app.schemas.organization import OrganizationCreateRequest, OrganizationResp
 
 
 router = APIRouter(prefix="/organizations", tags=["organizations"])
-ADMIN_ROLE = "administrateur_entreprise"
 
 
 def _slugify(value: str) -> str:
@@ -32,7 +36,11 @@ def _visible_organization_query(user_id: UUID):
     return (
         select(Organization)
         .join(OrganizationMember)
-        .where(OrganizationMember.user_id == user_id)
+        .where(
+            OrganizationMember.user_id == user_id,
+            OrganizationMember.status == MEMBERSHIP_STATUS_ACTIVE,
+            Organization.status == ORG_STATUS_ACTIVE,
+        )
         .order_by(Organization.created_at.desc())
     )
 
@@ -49,6 +57,7 @@ def create_organization(
         sector=payload.sector,
         size_range=payload.size_range,
         country=payload.country,
+        status=ORG_STATUS_ACTIVE,
         language=payload.language,
         timezone=payload.timezone,
         description=payload.description,
@@ -62,6 +71,7 @@ def create_organization(
                 organization_id=organization.id,
                 user_id=current_user.id,
                 role=ADMIN_ROLE,
+                status=MEMBERSHIP_STATUS_ACTIVE,
             )
         )
         session.commit()

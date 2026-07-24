@@ -53,6 +53,7 @@ def _create_user(session, suffix: str) -> User:
         first_name="Test",
         last_name=suffix,
         password_hash=get_password_hash("CorrectHorse42!"),
+        is_verified=True,
     )
     session.add(user)
     session.commit()
@@ -60,11 +61,21 @@ def _create_user(session, suffix: str) -> User:
     return user
 
 
+def _organization_payload(name: str, slug: str) -> OrganizationCreateRequest:
+    return OrganizationCreateRequest(
+        name=name,
+        slug=slug,
+        country="MA",
+        sector="software_saas",
+        size_range="11_50",
+    )
+
+
 def test_create_organization_creates_admin_membership_in_one_commit(db_session) -> None:
     user = _create_user(db_session, "owner")
 
     organization = create_organization(
-        OrganizationCreateRequest(name="Org Test Main", slug="org-test-main"),
+        _organization_payload("Org Test Main", "org-test-main"),
         user,
         db_session,
     )
@@ -78,6 +89,8 @@ def test_create_organization_creates_admin_membership_in_one_commit(db_session) 
 
     assert membership is not None
     assert membership.role == ADMIN_ROLE
+    assert membership.status == "active"
+    assert organization.status == "active"
     assert OrganizationResponse.model_validate(organization).slug == "org-test-main"
 
 
@@ -97,7 +110,7 @@ def test_create_organization_rolls_back_if_membership_creation_fails(
 
     with pytest.raises(RuntimeError):
         create_organization(
-            OrganizationCreateRequest(name="Org Test Rollback", slug="org-test-rollback"),
+            _organization_payload("Org Test Rollback", "org-test-rollback"),
             user,
             db_session,
         )
@@ -113,12 +126,12 @@ def test_list_organizations_only_returns_current_user_memberships(db_session) ->
     owner = _create_user(db_session, "owner-list")
     other = _create_user(db_session, "other-list")
     visible = create_organization(
-        OrganizationCreateRequest(name="Org Test Visible", slug="org-test-visible"),
+        _organization_payload("Org Test Visible", "org-test-visible"),
         owner,
         db_session,
     )
     create_organization(
-        OrganizationCreateRequest(name="Org Test Hidden", slug="org-test-hidden"),
+        _organization_payload("Org Test Hidden", "org-test-hidden"),
         other,
         db_session,
     )
@@ -132,7 +145,7 @@ def test_get_organization_requires_membership(db_session) -> None:
     owner = _create_user(db_session, "owner-get")
     other = _create_user(db_session, "other-get")
     organization = create_organization(
-        OrganizationCreateRequest(name="Org Test Private", slug="org-test-private"),
+        _organization_payload("Org Test Private", "org-test-private"),
         owner,
         db_session,
     )
@@ -147,14 +160,14 @@ def test_create_organization_rejects_duplicate_slug(db_session) -> None:
     owner = _create_user(db_session, "owner-duplicate")
     other = _create_user(db_session, "other-duplicate")
     create_organization(
-        OrganizationCreateRequest(name="Org Test Duplicate", slug="org-test-duplicate"),
+        _organization_payload("Org Test Duplicate", "org-test-duplicate"),
         owner,
         db_session,
     )
 
     with pytest.raises(HTTPException) as exc_info:
         create_organization(
-            OrganizationCreateRequest(name="Org Test Duplicate 2", slug="org-test-duplicate"),
+            _organization_payload("Org Test Duplicate 2", "org-test-duplicate"),
             other,
             db_session,
         )
