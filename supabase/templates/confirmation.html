@@ -1,0 +1,11 @@
+{{ if eq .Data.language "fr" }}
+<h2>Votre code de vérification NormCore</h2>
+<p>Saisissez ce code dans NormCore pour confirmer votre adresse e-mail :</p>
+<p style="font-size:32px;font-weight:700;letter-spacing:8px">{{ .Token }}</p>
+<p>Si vous n’avez pas créé de compte NormCore, ignorez cet e-mail.</p>
+{{ else }}
+<h2>Your NormCore verification code</h2>
+<p>Enter this code in NormCore to confirm your email address:</p>
+<p style="font-size:32px;font-weight:700;letter-spacing:8px">{{ .Token }}</p>
+<p>If you did not create a NormCore account, ignore this email.</p>
+{{ end }}

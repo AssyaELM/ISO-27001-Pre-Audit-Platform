@@ -1,2 +1,0 @@
-"""CapISO backend application package."""
-

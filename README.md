@@ -1,57 +1,54 @@
-# CapISO
+# NormCore landing page
 
-CapISO est un prototype academique non commercial d'assistance a la preparation et au pre-audit ISO/IEC 27001:2022.
+Premium, responsive landing page for NormCore, built with Next.js, TypeScript,
+Tailwind CSS, and a portable scroll-scrub scene controller.
 
-CapISO n'est ni affilie a ISO, ni approuve par ISO. La plateforme ne certifie pas une organisation et ne garantit pas la reussite d'un audit. Elle fournit une estimation de preparation basee sur les reponses, les preuves et les validations humaines.
-
-## Perimetre MVP
-
-Le MVP se concentre sur :
-
-- les 93 controles de l'Annexe A ISO/IEC 27001:2022 ;
-- la gestion des organisations, utilisateurs et roles ;
-- l'onboarding et la definition du perimetre SMSI ;
-- le questionnaire progressif ;
-- la SoA preliminaire ;
-- les preuves ajoutees manuellement ;
-- les ecarts et actions de remediation ;
-- les snapshots d'evaluation ;
-- le dashboard et le rapport exportable ;
-- quelques brouillons documentaires assistes par IA avec validation humaine.
-
-Les clauses 4 a 10, l'import avance Word/PDF, la recherche semantique, la base vectorielle, le Gantt, le SSO, l'application mobile native et l'acces multi-client consultant sont hors perimetre MVP.
-
-## Structure
-
-```text
-CapISO/
-  frontend/
-  backend/
-  docs/
-    mockups/
-  storage/
-    evidences/
-    imported_documents/
-    generated_documents/
-  README.md
-  .env.example
-  .gitignore
-```
-
-## References projet
-
-- Identite et regles : `docs/REFERENCES_PROJET_CAPISO.md`
-- Charte visuelle : `docs/CHARTE_VISUELLE_CAPISO.md`
-- Architecture initiale : `docs/ARCHITECTURE_INITIALE.md`
-- Modele de donnees MVP : `docs/DATA_MODEL_MVP.md`
-- Mockups officiels : `docs/mockups/`
-
-## Developpement local
-
-PostgreSQL peut etre lance seul pour le developpement local :
+## Run locally
 
 ```bash
-docker compose up -d postgres
+npm install
+npm run dev
 ```
 
-Le backend reste lance depuis `backend/` avec `uv run uvicorn app.main:app --reload`.
+Open `http://127.0.0.1:3103`.
+
+The npm scripts invoke their JavaScript entry points directly, so the same
+commands work in PowerShell, Command Prompt, and WSL.
+
+## Validate
+
+```bash
+npm run typecheck
+npm run lint
+npm run build
+```
+
+The current Architectural Matte Diorama scenes are code-rendered placeholders.
+Landing-page copy is centralized in `content/landing.ts` and the English/French
+preference is saved in the browser.
+
+## Supabase authentication
+
+Login, signup confirmation by six-digit email OTP, password recovery by OTP and
+password updates use Supabase Auth with SSR cookies. Add these public project
+values to `.env.local`:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your-key
+```
+
+The forms intentionally show a configuration message until both values exist.
+Full dashboard, OTP email-template and SMTP instructions are in
+`supabase/AUTH_SETUP.md`. Never expose a service-role key or SMTP password in a
+`NEXT_PUBLIC_` variable.
+
+## Before production
+
+- Replace the placeholder contact addresses with monitored mailboxes.
+- Set `NEXT_PUBLIC_LEGAL_ENTITY_NAME` and review the draft legal pages with
+  qualified counsel for the target markets.
+- Document the production hosting region, subprocessors, retention period and
+  vulnerability-reporting channel.
+- Add abuse protection appropriate to the deployment platform before public
+  traffic is enabled.
