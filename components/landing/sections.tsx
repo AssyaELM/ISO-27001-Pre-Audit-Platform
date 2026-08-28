@@ -30,6 +30,7 @@ import {
 import { DashboardPreview } from "./dashboard-preview";
 import { FAQAccordion } from "./faq";
 import { useLanguage } from "./language-context";
+import annexStyles from "@/components/public-iso27001/public-annex.module.css";
 
 const problemIcons = [FileQuestion, FolderLock, FileText, TriangleAlert];
 const stepIcons = [Building2, ClipboardCheck, ScanSearch, CheckCircle2];
@@ -46,6 +47,13 @@ const featureIcons = [
 ];
 const aiIcons = [FileQuestion, Target, FileText];
 const audienceIcons = [BriefcaseBusiness, ShieldCheck, UserRoundCheck];
+const annexIcons = [Building2, UsersRound, ShieldCheck, Network];
+const annexThemeRoutes = [
+  "/iso-27001/annex-a/organizational",
+  "/iso-27001/annex-a/people",
+  "/iso-27001/annex-a/physical",
+  "/iso-27001/annex-a/technological",
+] as const;
 
 function SectionHeading({ title, align = "left" }: { title: string; align?: "left" | "center" }) {
   return <h2 className={`section-title ${align === "center" ? "text-center" : ""}`}>{title}</h2>;
@@ -61,7 +69,7 @@ export function HeroSection() {
           <h1>{landingCopy.hero.title}</h1>
           <p className="hero-description">{landingCopy.hero.description}</p>
           <div className="hero-actions">
-            <Link className="button button-primary" href="/signup">
+            <Link prefetch={true} className="button button-primary" href="/signup">
               {landingCopy.hero.primaryCta}
               <ArrowRight size={17} />
             </Link>
@@ -151,6 +159,70 @@ export function DomainsSection() {
               </article>
             );
           })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function AnnexASection() {
+  const { copy: landingCopy } = useLanguage();
+  return (
+    <section id="annex-a" className="world-section content-section annex-a-section" data-scene="4" data-rail="4">
+      <div className="section-container">
+        <div className={annexStyles.hero}>
+          <p className={annexStyles.eyebrow}><span />{landingCopy.annexA.eyebrow}</p>
+          <h2 className={annexStyles.title}>{landingCopy.annexA.title}</h2>
+          <p className={annexStyles.subtitle}>{landingCopy.annexA.subtitle}</p>
+          <div className={annexStyles.statsRow}>
+            {landingCopy.annexA.stats.map((stat) => (
+              <div className={annexStyles.statCard} key={stat.label}>
+                <span className={annexStyles.statValue}>{stat.value}</span>
+                <span className={annexStyles.statLabel}>{stat.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className={annexStyles.themeGrid}>
+          {landingCopy.annexA.themes.map((theme, index) => {
+            const Icon = annexIcons[index];
+            return (
+            <article className={annexStyles.themeCard} key={theme.title}>
+              <div className={annexStyles.themeTop}>
+                <div style={{ display: "grid", gap: 12 }}>
+                  <span className={annexStyles.themeIcon} aria-hidden="true">
+                    <Icon size={23} />
+                  </span>
+                  <div>
+                    <h3 className={annexStyles.themeTitle}>{theme.title}</h3>
+                    <span className={annexStyles.themeCount}>{theme.count}</span>
+                  </div>
+                </div>
+              </div>
+              <p className={annexStyles.themeDescription}>{theme.description}</p>
+              <div className={annexStyles.chipList}>
+                {theme.previewControls.map((item) => (
+                  <span key={item} className={annexStyles.chip}>
+                    {item}
+                  </span>
+                ))}
+              </div>
+              <div className={annexStyles.cardActions}>
+                <Link className={annexStyles.cardLink} href={annexThemeRoutes[index]}>
+                  {theme.cta}
+                </Link>
+              </div>
+            </article>
+            );
+          })}
+        </div>
+
+        <div className={annexStyles.footerCta}>
+          <Link className="button button-primary" href="/iso-27001/annex-a">
+            {landingCopy.annexA.browseAll}
+            <ArrowRight size={17} />
+          </Link>
         </div>
       </div>
     </section>
@@ -267,7 +339,7 @@ export function FinalCTASection() {
         <div className="final-cta-copy glass-copy-panel">
           <SectionHeading title={landingCopy.finalCta.title} />
           <p>{landingCopy.finalCta.description}</p>
-          <Link className="button button-primary final-cta-button" href="/signup">
+          <Link prefetch={true} className="button button-primary final-cta-button" href="/signup">
             {landingCopy.finalCta.button}
             <ArrowRight size={17} />
           </Link>

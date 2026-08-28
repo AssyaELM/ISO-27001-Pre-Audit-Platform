@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { Language } from "@/content/landing";
 import { useStoredLanguage } from "@/components/language-preference";
+import { NormCoreLogo } from "@/components/branding/normcore-logo";
 
 export type PublicPageContent = {
   eyebrow: string;
@@ -21,9 +22,8 @@ export function PublicInfoPage({ content }: { content: Record<Language, PublicPa
   return (
     <main className="resource-page public-info-page">
       <div className="public-page-topbar">
-        <Link href="/" className="brand-lockup" aria-label="NormCore home">
-          <span className="brand-mark" aria-hidden="true" />
-          <span>NormCore</span>
+        <Link prefetch={true} href="/" className="brand-lockup" aria-label="NormCore home">
+          <NormCoreLogo width={180} height={49} priority />
         </Link>
         <button type="button" className="language-control" onClick={() => setLanguage(language === "en" ? "fr" : "en")}>
           {language === "en" ? "EN / FR" : "FR / EN"}
@@ -46,9 +46,9 @@ export function PublicInfoPage({ content }: { content: Record<Language, PublicPa
 
         <div className="public-page-actions">
           {page.primaryHref && page.primaryLabel && (
-            <Link className="button button-primary" href={page.primaryHref}>{page.primaryLabel}</Link>
+            <Link prefetch={true} className="button button-primary" href={page.primaryHref}>{page.primaryLabel}</Link>
           )}
-          <Link className="button button-secondary" href="/">
+          <Link prefetch={true} className="button button-secondary" href="/">
             {language === "en" ? "Back to home" : "Retour à l’accueil"}
           </Link>
         </div>

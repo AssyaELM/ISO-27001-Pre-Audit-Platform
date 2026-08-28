@@ -1,0 +1,25 @@
+import assert from "node:assert/strict";
+import { OpenRouterAiDocumentProvider, probeOpenRouterStructuredCapability, AiProviderError, decideOpenRouterCapabilityProbe, OPENROUTER_CAPABILITY_CACHE_TTL_MS, OPENROUTER_STRUCTURED_CAPABILITY_VERSION } from "../lib/ai/providers/index.ts";
+
+const good = JSON.stringify({ documentType: "structured_capability_probe", sections: [{ sectionId: "purpose", content: "Synthetic purpose." }, { sectionId: "scope", content: "Synthetic scope." }] });
+let sentBody;
+const provider = new OpenRouterAiDocumentProvider({ config: { apiKey: "test", model: "openai/gpt-oss-20b:free" }, fetchImpl: async (_url, init) => { sentBody = JSON.parse(String(init.body)); return new Response(JSON.stringify({ id: "probe", model: "openai/gpt-oss-20b:free", choices: [{ finish_reason: "stop", message: { content: good } }] }), { status: 200 }); } });
+const result = await probeOpenRouterStructuredCapability(provider);
+assert.equal(result.raw.diagnostics.contentPresent, true);
+assert.equal(result.output.sections.length, 2);
+assert.equal(sentBody.response_format.type, "json_schema");
+assert.equal(sentBody.response_format.json_schema.strict, true);
+assert.equal("reasoning" in sentBody, false);
+const empty = new OpenRouterAiDocumentProvider({ config: { apiKey: "test", model: "openai/gpt-oss-20b:free" }, fetchImpl: async () => new Response(JSON.stringify({ model: "openai/gpt-oss-20b:free", choices: [{ message: {} }] }), { status: 200 }) });
+await assert.rejects(() => probeOpenRouterStructuredCapability(empty), (error) => error instanceof AiProviderError && error.code === "AI_PROVIDER_BAD_RESPONSE");
+const malformed = new OpenRouterAiDocumentProvider({ config: { apiKey: "test", model: "openai/gpt-oss-20b:free" }, fetchImpl: async () => new Response(JSON.stringify({ model: "openai/gpt-oss-20b:free", choices: [{ message: { content: "not json" } }] }), { status: 200 }) });
+await assert.rejects(() => probeOpenRouterStructuredCapability(malformed), (error) => error instanceof AiProviderError && error.code === "AI_PROVIDER_BAD_RESPONSE");
+const now = Date.now();
+const cache = { provider: "openrouter", model: "nvidia/nemotron-3-super-120b-a12b:free", capabilityVersion: OPENROUTER_STRUCTURED_CAPABILITY_VERSION, passedAt: now - 1 };
+assert.equal(decideOpenRouterCapabilityProbe({ model: cache.model, now, state: "PASS" }).allowGeneration, true);
+assert.equal(decideOpenRouterCapabilityProbe({ model: cache.model, now, state: "FAIL", cache }).allowGeneration, false);
+assert.equal(decideOpenRouterCapabilityProbe({ model: cache.model, now, state: "TIMEOUT" }).allowGeneration, false);
+assert.equal(decideOpenRouterCapabilityProbe({ model: cache.model, now, state: "TIMEOUT", cache }).cacheUsed, true);
+assert.equal(decideOpenRouterCapabilityProbe({ model: "other:free", now, state: "TIMEOUT", cache }).allowGeneration, false);
+assert.equal(decideOpenRouterCapabilityProbe({ model: cache.model, now, state: "TIMEOUT", cache: { ...cache, passedAt: now - OPENROUTER_CAPABILITY_CACHE_TTL_MS - 1 } }).allowGeneration, false);
+console.log("OPENROUTER STRUCTURED CAPABILITY QA: PASS");

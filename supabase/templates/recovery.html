@@ -1,11 +1,12 @@
-{{ if eq .Data.language "fr" }}
-<h2>Réinitialisation de votre mot de passe NormCore</h2>
-<p>Saisissez ce code dans NormCore pour définir un nouveau mot de passe :</p>
-<p style="font-size:32px;font-weight:700;letter-spacing:8px">{{ .Token }}</p>
-<p>Si vous n’avez pas demandé cette réinitialisation, ignorez cet e-mail.</p>
-{{ else }}
-<h2>Reset your NormCore password</h2>
-<p>Enter this code in NormCore to set a new password:</p>
-<p style="font-size:32px;font-weight:700;letter-spacing:8px">{{ .Token }}</p>
-<p>If you did not request this reset, ignore this email.</p>
-{{ end }}
+<div style="background:#edf7f6;margin:0;padding:24px 10px;font-family:Arial,sans-serif;color:#294e5a">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"><tr><td align="center">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:620px;background:#fff;border:1px solid #cfe2e1;border-radius:14px;overflow:hidden">
+      <tr><td style="background:#062331;padding:24px 30px"><img src="{{ .SiteURL }}/images/normcore-logo.png" width="145" alt="NormCore" style="display:block;max-width:145px;height:auto"></td></tr>
+      <tr><td style="padding:36px 40px 30px">
+        {{ if eq .Data.language "fr" }}<h1 style="color:#062c3a;font-size:30px;line-height:1.2;margin:0 0 20px">Réinitialisez votre mot de passe</h1><p style="font-size:16px;line-height:1.65">Nous avons reçu une demande de réinitialisation de votre mot de passe NormCore.</p><p style="font-size:16px;line-height:1.65">Utilisez le code de vérification ci-dessous pour continuer.</p>{{ else }}<h1 style="color:#062c3a;font-size:30px;line-height:1.2;margin:0 0 20px">Reset your password</h1><p style="font-size:16px;line-height:1.65">We received a request to reset your NormCore password.</p><p style="font-size:16px;line-height:1.65">Use the verification code below to continue.</p>{{ end }}
+        <div style="background:#eefaf8;border:1px solid #9bded4;border-radius:10px;margin:26px 0;padding:20px;text-align:center;color:#062c3a;font-family:Consolas,Monaco,monospace;font-size:28px;font-weight:700;letter-spacing:8px">{{ .Token }}</div>
+        {{ if eq .Data.language "fr" }}<p style="font-size:15px;line-height:1.6">Saisissez ce code dans NormCore pour définir un nouveau mot de passe.</p><p style="background:#fff8e9;border-left:3px solid #e5aa4d;padding:12px 15px;font-size:13px;line-height:1.55">Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer cet e-mail.</p>{{ else }}<p style="font-size:15px;line-height:1.6">Enter this code in NormCore to set a new password.</p><p style="background:#fff8e9;border-left:3px solid #e5aa4d;padding:12px 15px;font-size:13px;line-height:1.55">If you did not request this password reset, you can safely ignore this email.</p>{{ end }}
+      </td></tr><tr><td style="border-top:1px solid #e1eeee;padding:22px 40px 26px"><p style="color:#0b5962;font-size:14px;font-weight:700;margin:0 0 5px">NormCore</p><p style="color:#718b90;font-size:12px;line-height:1.5;margin:0">Security readiness, structured for ISO 27001.<br>This email was sent automatically by NormCore.</p></td></tr>
+    </table>
+  </td></tr></table>
+</div>

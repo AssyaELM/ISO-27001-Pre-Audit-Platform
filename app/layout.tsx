@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { LocalWorkspaceCookieSync } from "@/components/session/local-workspace-cookie-sync";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://normcore.io"),
@@ -34,7 +35,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <LocalWorkspaceCookieSync />
+        {children}
+      </body>
     </html>
   );
 }

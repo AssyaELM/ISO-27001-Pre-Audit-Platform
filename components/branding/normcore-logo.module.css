@@ -1,0 +1,16 @@
+.frame {
+  display: block;
+  width: calc(var(--logo-width) * 0.88);
+  height: var(--logo-height);
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.image {
+  display: block;
+  width: var(--logo-width) !important;
+  max-width: none;
+  height: var(--logo-height) !important;
+  object-fit: contain;
+  object-position: left center;
+}

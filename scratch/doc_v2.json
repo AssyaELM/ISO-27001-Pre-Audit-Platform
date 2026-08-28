@@ -1,0 +1,350 @@
+{
+  "title": "Information Security Policy",
+  "language": "en",
+  "sections": [
+    {
+      "title": "Document Control",
+      "blocks": [
+        {
+          "rows": [
+            [
+              "Document Version",
+              "1.0"
+            ],
+            [
+              "Document Classification",
+              "to be defined"
+            ],
+            [
+              "Policy Owner",
+              "to be defined"
+            ],
+            [
+              "Approver",
+              "to be defined"
+            ],
+            [
+              "Review Frequency",
+              "to be defined"
+            ]
+          ],
+          "type": "table",
+          "headers": [
+            "Property",
+            "Value"
+          ]
+        }
+      ],
+      "status": "static",
+      "sectionId": "document_control"
+    },
+    {
+      "title": "Purpose",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": "The purpose of this Information Security Policy is to establish the organization’s overall direction and objectives for the protection of information assets, to define the principles and responsibilities for managing information security, and to ensure compliance with applicable legal, regulatory, and contractual requirements."
+        }
+      ],
+      "status": "generated",
+      "sectionId": "purpose"
+    },
+    {
+      "title": "Scope",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": "This Information Security Policy applies to all information assets, processing facilities, supporting infrastructure, and related activities of the organization, as well as to all personnel, contractors, and third parties who access or handle such assets, regardless of location."
+        }
+      ],
+      "status": "generated",
+      "sectionId": "scope"
+    },
+    {
+      "title": "Information Security Principles",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": "The organization adheres to the core principles of information security (CIA Triad): Confidentiality, Integrity, and Availability."
+        }
+      ],
+      "status": "static",
+      "sectionId": "information_security_principles"
+    },
+    {
+      "title": "Management Commitment",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": "Senior management commits to establishing, implementing, maintaining, and continually improving the Information Security Management System in alignment with ISO/IEC 27001 requirements."
+        },
+        {
+          "type": "bullet_list",
+          "items": [
+            "Provide the resources required to achieve the information security objectives.",
+            "Ensure that information security policies are defined, communicated, and enforced across the organization.",
+            "Review and approve the information security risk assessment and treatment plans.",
+            "Promote a culture of security awareness and compliance among all personnel.",
+            "Monitor ISMS performance and ensure timely corrective actions are taken."
+          ]
+        }
+      ],
+      "status": "generated",
+      "sectionId": "management_commitment"
+    },
+    {
+      "title": "Information Security Objectives",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": "The organization shall establish, maintain and continually improve information security objectives that support the Information Security Policy and contribute to the effectiveness of the ISMS."
+        },
+        {
+          "type": "bullet_list",
+          "items": [
+            "Ensure the confidentiality, integrity and availability of information assets are protected in accordance with risk assessments.",
+            "Achieve compliance with applicable legal, regulatory and contractual requirements relevant to information security.",
+            "Promote a culture of security awareness and competence among personnel to support risk‑based decision making.",
+            "Facilitate continual improvement of the ISMS through measurable performance indicators and periodic reviews."
+          ]
+        }
+      ],
+      "status": "generated",
+      "sectionId": "information_security_objectives"
+    },
+    {
+      "title": "Information Security Risk Management",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": "The organization shall establish, implement and maintain a systematic information security risk management process that aligns with the requirements of ISO/IEC 27001."
+        },
+        {
+          "type": "paragraph",
+          "content": "Risk management shall be conducted on an ongoing basis, and all relevant risk information shall be documented and made available to authorized personnel."
+        },
+        {
+          "type": "bullet_list",
+          "items": [
+            "Define risk assessment criteria and risk acceptance levels",
+            "Identify information assets, associated threats and vulnerabilities",
+            "Analyse and evaluate identified risks against the defined criteria",
+            "Select and document appropriate risk treatment options",
+            "Obtain necessary approvals for risk treatment plans",
+            "Implement, monitor and review risk treatment actions"
+          ]
+        },
+        {
+          "type": "numbered_list",
+          "items": [
+            "Establish the risk management framework and governance structure",
+            "Perform risk identification for all information assets",
+            "Conduct risk analysis and evaluation",
+            "Determine risk treatment options and develop treatment plans",
+            "Approve and implement risk treatment measures",
+            "Continuously monitor risk status and effectiveness of treatments",
+            "Review and update the risk management process as needed"
+          ]
+        }
+      ],
+      "status": "generated",
+      "sectionId": "information_security_risk_management"
+    },
+    {
+      "title": "Roles and Responsibilities",
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 3,
+          "content": "Roles and Responsibilities"
+        },
+        {
+          "rows": [
+            [
+              "to be defined",
+              "to be defined"
+            ],
+            [
+              "to be defined",
+              "to be defined"
+            ]
+          ],
+          "type": "table",
+          "headers": [
+            "Role",
+            "Responsibility"
+          ]
+        }
+      ],
+      "status": "generated",
+      "sectionId": "roles_and_responsibilities"
+    },
+    {
+      "title": "Information Security Policy Framework",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": "This Information Security Policy is supported by the following policies and procedures:"
+        },
+        {
+          "type": "paragraph",
+          "content": "No additional framework documents are currently defined."
+        }
+      ],
+      "status": "static",
+      "sectionId": "information_security_policy_framework"
+    },
+    {
+      "title": "Security Awareness and Competence",
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 3,
+          "content": "Security Awareness and Competence"
+        },
+        {
+          "type": "paragraph",
+          "content": "The organization shall ensure that all personnel are aware of information security responsibilities and possess the competence required to fulfill them."
+        },
+        {
+          "type": "bullet_list",
+          "items": [
+            "Define security awareness objectives aligned with the information security policy",
+            "Provide regular security training and awareness activities for all personnel",
+            "Assess the competence of personnel in relation to their security duties",
+            "Maintain records of training, awareness activities, and competence assessments",
+            "Promote a culture of security throughout the organization"
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": "The effectiveness of the security awareness program shall be reviewed periodically and improvements shall be implemented as needed to address emerging threats and changes in the business environment."
+        }
+      ],
+      "status": "generated",
+      "sectionId": "security_awareness_and_competence"
+    },
+    {
+      "title": "Legal, Regulatory and Contractual Requirements",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": "The organization shall identify, assess, and comply with all applicable legal, regulatory, and contractual requirements that affect the confidentiality, integrity, and availability of information assets."
+        },
+        {
+          "type": "bullet_list",
+          "items": [
+            "Applicable national and international legislation governing data protection, privacy, and security",
+            "Regulatory obligations imposed by sector‑specific authorities and supervisory bodies",
+            "Contractual obligations arising from agreements with customers, partners, and service providers",
+            "Other binding commitments such as industry codes of practice or standards"
+          ]
+        }
+      ],
+      "status": "generated",
+      "sectionId": "legal_regulatory_and_contractual_requirements"
+    },
+    {
+      "title": "Monitoring and Performance Evaluation",
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 3,
+          "content": "Monitoring and Performance Evaluation"
+        },
+        {
+          "type": "paragraph",
+          "content": "The organization shall define, implement, and maintain processes to monitor the effectiveness of the Information Security Management System (ISMS) and to evaluate its performance against established objectives."
+        },
+        {
+          "type": "bullet_list",
+          "items": [
+            "Periodic internal audits shall be conducted to assess conformity with the ISMS requirements.",
+            "Management reviews shall be performed to examine the suitability, adequacy, and effectiveness of the ISMS.",
+            "Performance indicators shall be identified and measured to provide insight into security posture and improvement opportunities.",
+            "Non‑conformities and incidents shall be recorded, analyzed, and used to drive corrective actions."
+          ]
+        }
+      ],
+      "status": "generated",
+      "sectionId": "monitoring_and_performance_evaluation"
+    },
+    {
+      "title": "Policy Compliance and Exceptions",
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 3,
+          "content": "Policy Compliance and Exceptions"
+        },
+        {
+          "type": "paragraph",
+          "content": "All personnel, contractors, and third‑party service providers shall adhere to the requirements set forth in this Information Security Policy. Non‑compliance shall be addressed in accordance with the established exception management process, ensuring that the integrity, confidentiality, and availability of information assets are maintained."
+        },
+        {
+          "type": "bullet_list",
+          "items": [
+            "Compliance shall be demonstrated through documented evidence, regular self‑assessment, and audit verification; any deviation from policy requirements must be reported promptly to the designated authority.",
+            "Exceptions may be granted only when a documented business justification exists, the risk is assessed and approved, and compensating controls are implemented to mitigate residual risk."
+          ]
+        }
+      ],
+      "status": "generated",
+      "sectionId": "policy_compliance_and_exceptions"
+    },
+    {
+      "title": "Communication and Availability",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "content": "The organization shall ensure that information security communications are established, maintained, and available to all relevant parties in accordance with the information security policy framework."
+        },
+        {
+          "type": "paragraph",
+          "content": "All security-related communications, including policies, procedures, alerts, and incident notifications, shall be disseminated through approved channels that guarantee timely delivery and accessibility."
+        },
+        {
+          "type": "paragraph",
+          "content": "The organization shall maintain the availability of critical security information and communication platforms, ensuring they remain operational and accessible to authorized personnel during normal operations and in response to security incidents."
+        },
+        {
+          "type": "paragraph",
+          "content": "Mechanisms for feedback and acknowledgement of received communications shall be defined to confirm understanding and compliance by the intended recipients."
+        }
+      ],
+      "status": "generated",
+      "sectionId": "communication_and_availability"
+    },
+    {
+      "title": "Review and Continual Improvement",
+      "blocks": [],
+      "status": "static",
+      "sectionId": "review_and_continual_improvement"
+    },
+    {
+      "title": "Approval",
+      "blocks": [
+        {
+          "rows": [
+            [
+              "Approver",
+              "to be defined",
+              "to be defined",
+              ""
+            ]
+          ],
+          "type": "table",
+          "headers": [
+            "Role",
+            "Name",
+            "Date",
+            "Signature"
+          ]
+        }
+      ],
+      "status": "static",
+      "sectionId": "approval"
+    }
+  ],
+  "documentType": "information_security_policy"
+}

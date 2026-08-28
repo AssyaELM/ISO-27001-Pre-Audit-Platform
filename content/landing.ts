@@ -111,6 +111,52 @@ export const landingCopy = {
       },
     ],
   },
+  annexA: {
+    eyebrow: "Public ISO 27001 library",
+    title: "ISO 27001 Themes & Annex Controls",
+    subtitle:
+      "Explore the 93 ISO/IEC 27001:2022 Annex A controls across four themes and understand what each control addresses, why it matters, and the practical areas organisations should consider.",
+    stats: [
+      { label: "Controls", value: "93" },
+      { label: "Themes", value: "4" },
+      { label: "Edition", value: "ISO/IEC 27001:2022" },
+    ],
+    themes: [
+      {
+        title: "Organizational",
+        count: "37 controls",
+        description:
+          "Organizational controls define how information security is governed and managed across the organisation. They cover policies, responsibilities, assets, access, suppliers, incidents, continuity, compliance and operational processes.",
+        previewControls: ["A.5.1 Policies", "A.5.7 Threat Intelligence", "A.5.23 Cloud Services"],
+        cta: "Explore Organizational controls",
+      },
+      {
+        title: "People",
+        count: "8 controls",
+        description:
+          "People controls address the human side of information security, including screening, employment responsibilities, awareness, confidentiality, remote working and security event reporting.",
+        previewControls: ["A.6.1 Screening", "A.6.3 Awareness", "A.6.7 Remote Working"],
+        cta: "Explore People controls",
+      },
+      {
+        title: "Physical",
+        count: "14 controls",
+        description:
+          "Physical controls protect premises, equipment and information assets against unauthorised physical access, damage, theft and environmental threats.",
+        previewControls: ["A.7.1 Perimeters", "A.7.2 Entry", "A.7.7 Clear Desk"],
+        cta: "Explore Physical controls",
+      },
+      {
+        title: "Technological",
+        count: "34 controls",
+        description:
+          "Technological controls protect systems, applications, networks and data through access control, vulnerability management, monitoring, backups, cryptography and secure development.",
+        previewControls: ["A.8.2 Privileged Access", "A.8.8 Vulnerabilities", "A.8.13 Backup"],
+        cta: "Explore Technological controls",
+      },
+    ],
+    browseAll: "Browse all 93 controls →",
+  },
   features: {
     title: "Everything you need to move from uncertainty to action.",
     items: [
@@ -358,6 +404,52 @@ export const landingCopyFr = {
         controls: "34 contrôles",
       },
     ],
+  },
+  annexA: {
+    eyebrow: "Bibliothèque publique ISO 27001",
+    title: "Thèmes ISO 27001 et contrôles de l’Annexe A",
+    subtitle:
+      "Explorez les 93 contrôles de l’Annexe A d’ISO/IEC 27001:2022 répartis en quatre thèmes et comprenez ce que chaque contrôle couvre, pourquoi il compte et les domaines pratiques à considérer.",
+    stats: [
+      { label: "Contrôles", value: "93" },
+      { label: "Thèmes", value: "4" },
+      { label: "Édition", value: "ISO/IEC 27001:2022" },
+    ],
+    themes: [
+      {
+        title: "Organisationnel",
+        count: "37 contrôles",
+        description:
+          "Les contrôles organisationnels définissent la manière dont la sécurité de l’information est gouvernée et pilotée dans l’organisation. Ils couvrent les politiques, responsabilités, actifs, accès, fournisseurs, incidents, continuité, conformité et processus opérationnels.",
+        previewControls: ["A.5.1 Politiques", "A.5.7 Threat Intelligence", "A.5.23 Cloud Services"],
+        cta: "Explorer les contrôles organisationnels",
+      },
+      {
+        title: "Personnes",
+        count: "8 contrôles",
+        description:
+          "Les contrôles liés aux personnes traitent la dimension humaine de la sécurité de l’information, notamment le filtrage, les responsabilités liées à l’emploi, la sensibilisation, la confidentialité, le télétravail et le signalement d’événements de sécurité.",
+        previewControls: ["A.6.1 Screening", "A.6.3 Sensibilisation", "A.6.7 Télétravail"],
+        cta: "Explorer les contrôles liés aux personnes",
+      },
+      {
+        title: "Physique",
+        count: "14 contrôles",
+        description:
+          "Les contrôles physiques protègent les locaux, les équipements et les actifs d’information contre les accès physiques non autorisés, les dommages, le vol et les menaces environnementales.",
+        previewControls: ["A.7.1 Périmètres", "A.7.2 Entrée", "A.7.7 Bureau dégagé"],
+        cta: "Explorer les contrôles physiques",
+      },
+      {
+        title: "Technologique",
+        count: "34 contrôles",
+        description:
+          "Les contrôles technologiques protègent les systèmes, applications, réseaux et données via le contrôle d’accès, la gestion des vulnérabilités, la surveillance, les sauvegardes, la cryptographie et le développement sécurisé.",
+        previewControls: ["A.8.2 Accès privilégié", "A.8.8 Vulnérabilités", "A.8.13 Sauvegarde"],
+        cta: "Explorer les contrôles technologiques",
+      },
+    ],
+    browseAll: "Parcourir les 93 contrôles →",
   },
   features: {
     title: "Tout ce qu’il faut pour passer de l’incertitude à l’action.",

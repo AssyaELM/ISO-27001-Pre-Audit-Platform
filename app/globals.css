@@ -123,27 +123,12 @@ a {
   white-space: nowrap;
 }
 
-.brand-mark {
-  position: relative;
-  display: inline-block;
-  width: 25px;
-  height: 25px;
-  transform: rotate(45deg);
-  border: 4px solid var(--teal-500);
-  border-radius: 7px;
-  box-shadow:
-    inset 0 0 0 3px var(--ink-950),
-    0 0 20px rgba(24, 211, 181, 0.28);
-}
-
-.brand-mark::after {
-  content: "";
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  inset: 5px;
-  border-radius: 2px;
-  background: var(--teal-300);
+.brand-logo {
+  display: block;
+  width: 180px;
+  height: 49px;
+  object-fit: contain;
+  object-position: left center;
 }
 
 .desktop-nav {
@@ -1493,10 +1478,9 @@ a {
   font-size: 1.15rem;
 }
 
-.auth-header .brand-mark {
-  box-shadow:
-    inset 0 0 0 3px var(--white),
-    0 6px 18px rgba(9, 83, 91, 0.12);
+.auth-header .brand-logo {
+  width: 180px;
+  height: 49px;
 }
 
 .auth-back-link {
@@ -4589,3 +4573,4 @@ a {
     padding: 13px 20px;
   }
 }
+.access-status-heading{text-align:center}.access-status-icon{display:grid;place-items:center;width:50px;height:50px;margin:0 auto 18px;border-radius:50%;background:#ddf6f1;color:#078277}.access-status-icon.is-rejected{background:#fdecef;color:#b34a62}.access-status-heading p{max-width:440px;margin-right:auto!important;margin-left:auto!important;line-height:1.6}

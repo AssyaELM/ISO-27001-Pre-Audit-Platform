@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useLanguage } from "./language-context";
+import { NormCoreLogo } from "@/components/branding/normcore-logo";
 
 const productLinks = ["#how-it-works", "#features", "/security", "/pricing"] as const;
 const resourceLinks = [
@@ -23,20 +24,19 @@ export function Footer() {
       <div className="footer-grid">
         <div className="footer-brand">
           <a className="brand-lockup" href="#product">
-            <span className="brand-mark" aria-hidden="true" />
-            <span>{copy.navigation.brand}</span>
+            <NormCoreLogo width={180} height={49} alt={copy.navigation.brand} />
           </a>
         </div>
         <FooterColumn title={headings[0]}>
-          {copy.footer.product.map((item, index) => <Link key={item} href={productLinks[index]}>{item}</Link>)}
+          {copy.footer.product.map((item, index) => <Link prefetch={true} key={item} href={productLinks[index]}>{item}</Link>)}
         </FooterColumn>
         <FooterColumn title={headings[1]}>
           {copy.footer.resources.map((item, index) => (
-            <Link key={item} href={resourceLinks[index]}>{item}</Link>
+            <Link prefetch={true} key={item} href={resourceLinks[index]}>{item}</Link>
           ))}
         </FooterColumn>
         <FooterColumn title={headings[2]}>
-          {copy.footer.legal.map((item, index) => <Link key={item} href={legalLinks[index]}>{item}</Link>)}
+          {copy.footer.legal.map((item, index) => <Link prefetch={true} key={item} href={legalLinks[index]}>{item}</Link>)}
         </FooterColumn>
         <FooterColumn title={headings[3]}>
           {copy.footer.language.map((item, index) => (

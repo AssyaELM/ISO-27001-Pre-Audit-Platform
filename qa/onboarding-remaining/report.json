@@ -1,0 +1,1220 @@
+{
+  "generatedAt": "2026-08-04T09:57:12.440Z",
+  "appOrigin": "http://127.0.0.1:3103",
+  "passed": 21,
+  "failed": 0,
+  "results": [
+    {
+      "viewport": {
+        "name": "mobile-390x844",
+        "width": 390,
+        "height": 844
+      },
+      "screen": 5,
+      "name": "software-development",
+      "metrics": {
+        "title": "Software development",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "scrollWidth": 390,
+        "scrollHeight": 965,
+        "panel": {
+          "top": 129,
+          "right": 378,
+          "bottom": 936.578125,
+          "left": 12,
+          "width": 366,
+          "height": 807.578125
+        },
+        "footer": {
+          "top": 841.578125,
+          "right": 377,
+          "bottom": 935.578125,
+          "left": 13,
+          "width": 364,
+          "height": 94
+        },
+        "back": {
+          "top": 868.578125,
+          "right": 188.5,
+          "bottom": 922.578125,
+          "left": 33,
+          "width": 155.5,
+          "height": 54
+        },
+        "next": {
+          "top": 868.578125,
+          "right": 357,
+          "bottom": 922.578125,
+          "left": 201.5,
+          "width": 155.5,
+          "height": 54
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 1
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\software-development-mobile-390x844.png"
+    },
+    {
+      "viewport": {
+        "name": "mobile-390x844",
+        "width": 390,
+        "height": 844
+      },
+      "screen": 6,
+      "name": "work-model",
+      "metrics": {
+        "title": "Work model",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "scrollWidth": 390,
+        "scrollHeight": 984,
+        "panel": {
+          "top": 129,
+          "right": 378,
+          "bottom": 955.578125,
+          "left": 12,
+          "width": 366,
+          "height": 826.578125
+        },
+        "footer": {
+          "top": 860.578125,
+          "right": 377,
+          "bottom": 954.578125,
+          "left": 13,
+          "width": 364,
+          "height": 94
+        },
+        "back": {
+          "top": 887.578125,
+          "right": 188.5,
+          "bottom": 941.578125,
+          "left": 33,
+          "width": 155.5,
+          "height": 54
+        },
+        "next": {
+          "top": 887.578125,
+          "right": 357,
+          "bottom": 941.578125,
+          "left": 201.5,
+          "width": 155.5,
+          "height": 54
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 1
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\work-model-mobile-390x844.png"
+    },
+    {
+      "viewport": {
+        "name": "mobile-390x844",
+        "width": 390,
+        "height": 844
+      },
+      "screen": 7,
+      "name": "assessment-coverage",
+      "metrics": {
+        "title": "Assessment coverage",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "scrollWidth": 390,
+        "scrollHeight": 1038,
+        "panel": {
+          "top": 129,
+          "right": 378,
+          "bottom": 1009.71875,
+          "left": 12,
+          "width": 366,
+          "height": 880.71875
+        },
+        "footer": {
+          "top": 914.71875,
+          "right": 377,
+          "bottom": 1008.71875,
+          "left": 13,
+          "width": 364,
+          "height": 94
+        },
+        "back": {
+          "top": 941.71875,
+          "right": 188.5,
+          "bottom": 995.71875,
+          "left": 33,
+          "width": 155.5,
+          "height": 54
+        },
+        "next": {
+          "top": 941.71875,
+          "right": 357,
+          "bottom": 995.71875,
+          "left": 201.5,
+          "width": 155.5,
+          "height": 54
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 1
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\assessment-coverage-mobile-390x844.png"
+    },
+    {
+      "viewport": {
+        "name": "mobile-390x844",
+        "width": 390,
+        "height": 844
+      },
+      "screen": 8,
+      "name": "owner-information",
+      "metrics": {
+        "title": "What is your role in the organization?",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "scrollWidth": 390,
+        "scrollHeight": 892,
+        "panel": {
+          "top": 129,
+          "right": 378,
+          "bottom": 864.21875,
+          "left": 12,
+          "width": 366,
+          "height": 735.21875
+        },
+        "footer": {
+          "top": 769.21875,
+          "right": 377,
+          "bottom": 863.21875,
+          "left": 13,
+          "width": 364,
+          "height": 94
+        },
+        "back": {
+          "top": 796.21875,
+          "right": 188.5,
+          "bottom": 850.21875,
+          "left": 33,
+          "width": 155.5,
+          "height": 54
+        },
+        "next": {
+          "top": 796.21875,
+          "right": 357,
+          "bottom": 850.21875,
+          "left": 201.5,
+          "width": 155.5,
+          "height": 54
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 0
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\owner-information-mobile-390x844.png"
+    },
+    {
+      "viewport": {
+        "name": "mobile-390x844",
+        "width": 390,
+        "height": 844
+      },
+      "screen": 9,
+      "name": "review",
+      "metrics": {
+        "title": "Review your workspace",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "scrollWidth": 390,
+        "scrollHeight": 1325,
+        "panel": {
+          "top": 129,
+          "right": 378,
+          "bottom": 1296.6875,
+          "left": 12,
+          "width": 366,
+          "height": 1167.6875
+        },
+        "footer": {
+          "top": 1201.6875,
+          "right": 377,
+          "bottom": 1295.6875,
+          "left": 13,
+          "width": 364,
+          "height": 94
+        },
+        "back": {
+          "top": 1228.6875,
+          "right": 188.5,
+          "bottom": 1282.6875,
+          "left": 33,
+          "width": 155.5,
+          "height": 54
+        },
+        "next": {
+          "top": 1228.6875,
+          "right": 357,
+          "bottom": 1282.6875,
+          "left": 201.5,
+          "width": 155.5,
+          "height": 54
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 0
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\review-mobile-390x844.png"
+    },
+    {
+      "viewport": {
+        "name": "tablet-768x1024",
+        "width": 768,
+        "height": 1024
+      },
+      "screen": 5,
+      "name": "software-development",
+      "metrics": {
+        "title": "Software development",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "scrollWidth": 753,
+        "scrollHeight": 1065,
+        "panel": {
+          "top": 145.546875,
+          "right": 733,
+          "bottom": 1020.640625,
+          "left": 20,
+          "width": 713,
+          "height": 875.09375
+        },
+        "footer": {
+          "top": 934.640625,
+          "right": 732,
+          "bottom": 1019.640625,
+          "left": 21,
+          "width": 711,
+          "height": 85
+        },
+        "back": {
+          "top": 948.640625,
+          "right": 191,
+          "bottom": 1006.640625,
+          "left": 41,
+          "width": 150,
+          "height": 58
+        },
+        "next": {
+          "top": 948.640625,
+          "right": 712,
+          "bottom": 1006.640625,
+          "left": 502,
+          "width": 210,
+          "height": 58
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 1
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\software-development-tablet-768x1024.png"
+    },
+    {
+      "viewport": {
+        "name": "tablet-768x1024",
+        "width": 768,
+        "height": 1024
+      },
+      "screen": 6,
+      "name": "work-model",
+      "metrics": {
+        "title": "Organization name",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "scrollWidth": 753,
+        "scrollHeight": 1037,
+        "panel": {
+          "top": 361.953125,
+          "right": 733,
+          "bottom": 776.125,
+          "left": 20,
+          "width": 713,
+          "height": 414.171875
+        },
+        "footer": {
+          "top": 690.125,
+          "right": 732,
+          "bottom": 775.125,
+          "left": 21,
+          "width": 711,
+          "height": 85
+        },
+        "back": {
+          "top": 704.125,
+          "right": 191,
+          "bottom": 762.125,
+          "left": 41,
+          "width": 150,
+          "height": 58
+        },
+        "next": {
+          "top": 704.125,
+          "right": 712,
+          "bottom": 762.125,
+          "left": 502,
+          "width": 210,
+          "height": 58
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 0
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\work-model-tablet-768x1024.png"
+    },
+    {
+      "viewport": {
+        "name": "tablet-768x1024",
+        "width": 768,
+        "height": 1024
+      },
+      "screen": 7,
+      "name": "assessment-coverage",
+      "metrics": {
+        "title": "Assessment coverage",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "scrollWidth": 753,
+        "scrollHeight": 1156,
+        "panel": {
+          "top": 145.546875,
+          "right": 733,
+          "bottom": 1111.96875,
+          "left": 20,
+          "width": 713,
+          "height": 966.421875
+        },
+        "footer": {
+          "top": 1025.96875,
+          "right": 732,
+          "bottom": 1110.96875,
+          "left": 21,
+          "width": 711,
+          "height": 85
+        },
+        "back": {
+          "top": 1039.96875,
+          "right": 191,
+          "bottom": 1097.96875,
+          "left": 41,
+          "width": 150,
+          "height": 58
+        },
+        "next": {
+          "top": 1039.96875,
+          "right": 712,
+          "bottom": 1097.96875,
+          "left": 502,
+          "width": 210,
+          "height": 58
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 1
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\assessment-coverage-tablet-768x1024.png"
+    },
+    {
+      "viewport": {
+        "name": "tablet-768x1024",
+        "width": 768,
+        "height": 1024
+      },
+      "screen": 8,
+      "name": "owner-information",
+      "metrics": {
+        "title": "What is your role in the organization?",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "scrollWidth": 753,
+        "scrollHeight": 1037,
+        "panel": {
+          "top": 214.34375,
+          "right": 733,
+          "bottom": 923.734375,
+          "left": 20,
+          "width": 713,
+          "height": 709.390625
+        },
+        "footer": {
+          "top": 837.734375,
+          "right": 732,
+          "bottom": 922.734375,
+          "left": 21,
+          "width": 711,
+          "height": 85
+        },
+        "back": {
+          "top": 851.734375,
+          "right": 191,
+          "bottom": 909.734375,
+          "left": 41,
+          "width": 150,
+          "height": 58
+        },
+        "next": {
+          "top": 851.734375,
+          "right": 712,
+          "bottom": 909.734375,
+          "left": 502,
+          "width": 210,
+          "height": 58
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 0
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\owner-information-tablet-768x1024.png"
+    },
+    {
+      "viewport": {
+        "name": "tablet-768x1024",
+        "width": 768,
+        "height": 1024
+      },
+      "screen": 9,
+      "name": "review",
+      "metrics": {
+        "title": "Review your workspace",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "scrollWidth": 753,
+        "scrollHeight": 1284,
+        "panel": {
+          "top": 145.546875,
+          "right": 733,
+          "bottom": 1240.171875,
+          "left": 20,
+          "width": 713,
+          "height": 1094.625
+        },
+        "footer": {
+          "top": 1154.171875,
+          "right": 732,
+          "bottom": 1239.171875,
+          "left": 21,
+          "width": 711,
+          "height": 85
+        },
+        "back": {
+          "top": 1168.171875,
+          "right": 191,
+          "bottom": 1226.171875,
+          "left": 41,
+          "width": 150,
+          "height": 58
+        },
+        "next": {
+          "top": 1168.171875,
+          "right": 712,
+          "bottom": 1226.171875,
+          "left": 502,
+          "width": 210,
+          "height": 58
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 0
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\review-tablet-768x1024.png"
+    },
+    {
+      "viewport": {
+        "name": "laptop-1280x720",
+        "width": 1280,
+        "height": 720
+      },
+      "screen": 5,
+      "name": "software-development",
+      "metrics": {
+        "title": "Software development",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "scrollWidth": 1280,
+        "scrollHeight": 720,
+        "panel": {
+          "top": 74,
+          "right": 1220,
+          "bottom": 708,
+          "left": 60,
+          "width": 1160,
+          "height": 634
+        },
+        "footer": {
+          "top": 643,
+          "right": 1219,
+          "bottom": 707,
+          "left": 61,
+          "width": 1158,
+          "height": 64
+        },
+        "back": {
+          "top": 652.5,
+          "right": 239,
+          "bottom": 698.5,
+          "left": 89,
+          "width": 150,
+          "height": 46
+        },
+        "next": {
+          "top": 652.5,
+          "right": 1191,
+          "bottom": 698.5,
+          "left": 986,
+          "width": 205,
+          "height": 46
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 1
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\software-development-laptop-1280x720.png"
+    },
+    {
+      "viewport": {
+        "name": "laptop-1280x720",
+        "width": 1280,
+        "height": 720
+      },
+      "screen": 6,
+      "name": "work-model",
+      "metrics": {
+        "title": "Work model",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "scrollWidth": 1280,
+        "scrollHeight": 720,
+        "panel": {
+          "top": 74,
+          "right": 1220,
+          "bottom": 708,
+          "left": 60,
+          "width": 1160,
+          "height": 634
+        },
+        "footer": {
+          "top": 643,
+          "right": 1219,
+          "bottom": 707,
+          "left": 61,
+          "width": 1158,
+          "height": 64
+        },
+        "back": {
+          "top": 652.5,
+          "right": 239,
+          "bottom": 698.5,
+          "left": 89,
+          "width": 150,
+          "height": 46
+        },
+        "next": {
+          "top": 652.5,
+          "right": 1191,
+          "bottom": 698.5,
+          "left": 986,
+          "width": 205,
+          "height": 46
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 1
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\work-model-laptop-1280x720.png"
+    },
+    {
+      "viewport": {
+        "name": "laptop-1280x720",
+        "width": 1280,
+        "height": 720
+      },
+      "screen": 7,
+      "name": "assessment-coverage",
+      "metrics": {
+        "title": "Assessment coverage",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "scrollWidth": 1280,
+        "scrollHeight": 720,
+        "panel": {
+          "top": 74,
+          "right": 1220,
+          "bottom": 708,
+          "left": 60,
+          "width": 1160,
+          "height": 634
+        },
+        "footer": {
+          "top": 643,
+          "right": 1219,
+          "bottom": 707,
+          "left": 61,
+          "width": 1158,
+          "height": 64
+        },
+        "back": {
+          "top": 652.5,
+          "right": 239,
+          "bottom": 698.5,
+          "left": 89,
+          "width": 150,
+          "height": 46
+        },
+        "next": {
+          "top": 652.5,
+          "right": 1191,
+          "bottom": 698.5,
+          "left": 986,
+          "width": 205,
+          "height": 46
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 1
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\assessment-coverage-laptop-1280x720.png"
+    },
+    {
+      "viewport": {
+        "name": "laptop-1280x720",
+        "width": 1280,
+        "height": 720
+      },
+      "screen": 8,
+      "name": "owner-information",
+      "metrics": {
+        "title": "What is your role in the organization?",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "scrollWidth": 1280,
+        "scrollHeight": 720,
+        "panel": {
+          "top": 74,
+          "right": 1220,
+          "bottom": 708,
+          "left": 60,
+          "width": 1160,
+          "height": 634
+        },
+        "footer": {
+          "top": 643,
+          "right": 1219,
+          "bottom": 707,
+          "left": 61,
+          "width": 1158,
+          "height": 64
+        },
+        "back": {
+          "top": 652.5,
+          "right": 239,
+          "bottom": 698.5,
+          "left": 89,
+          "width": 150,
+          "height": 46
+        },
+        "next": {
+          "top": 652.5,
+          "right": 1191,
+          "bottom": 698.5,
+          "left": 986,
+          "width": 205,
+          "height": 46
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 0
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\owner-information-laptop-1280x720.png"
+    },
+    {
+      "viewport": {
+        "name": "laptop-1280x720",
+        "width": 1280,
+        "height": 720
+      },
+      "screen": 9,
+      "name": "review",
+      "metrics": {
+        "title": "Review your workspace",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "scrollWidth": 1280,
+        "scrollHeight": 720,
+        "panel": {
+          "top": 74,
+          "right": 1220,
+          "bottom": 708,
+          "left": 60,
+          "width": 1160,
+          "height": 634
+        },
+        "footer": {
+          "top": 643,
+          "right": 1219,
+          "bottom": 707,
+          "left": 61,
+          "width": 1158,
+          "height": 64
+        },
+        "back": {
+          "top": 652.5,
+          "right": 239,
+          "bottom": 698.5,
+          "left": 89,
+          "width": 150,
+          "height": 46
+        },
+        "next": {
+          "top": 652.5,
+          "right": 1191,
+          "bottom": 698.5,
+          "left": 986,
+          "width": 205,
+          "height": 46
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 0
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\review-laptop-1280x720.png"
+    },
+    {
+      "viewport": {
+        "name": "desktop-1440x900",
+        "width": 1440,
+        "height": 900
+      },
+      "screen": 5,
+      "name": "software-development",
+      "metrics": {
+        "title": "Software development",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "scrollWidth": 1440,
+        "scrollHeight": 900,
+        "panel": {
+          "top": 121,
+          "right": 1300,
+          "bottom": 841,
+          "left": 140,
+          "width": 1160,
+          "height": 720
+        },
+        "footer": {
+          "top": 776,
+          "right": 1299,
+          "bottom": 840,
+          "left": 141,
+          "width": 1158,
+          "height": 64
+        },
+        "back": {
+          "top": 785.5,
+          "right": 319,
+          "bottom": 831.5,
+          "left": 169,
+          "width": 150,
+          "height": 46
+        },
+        "next": {
+          "top": 785.5,
+          "right": 1271,
+          "bottom": 831.5,
+          "left": 1066,
+          "width": 205,
+          "height": 46
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 1
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\software-development-desktop-1440x900.png"
+    },
+    {
+      "viewport": {
+        "name": "desktop-1440x900",
+        "width": 1440,
+        "height": 900
+      },
+      "screen": 6,
+      "name": "work-model",
+      "metrics": {
+        "title": "Work model",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "scrollWidth": 1440,
+        "scrollHeight": 900,
+        "panel": {
+          "top": 121,
+          "right": 1300,
+          "bottom": 841,
+          "left": 140,
+          "width": 1160,
+          "height": 720
+        },
+        "footer": {
+          "top": 776,
+          "right": 1299,
+          "bottom": 840,
+          "left": 141,
+          "width": 1158,
+          "height": 64
+        },
+        "back": {
+          "top": 785.5,
+          "right": 319,
+          "bottom": 831.5,
+          "left": 169,
+          "width": 150,
+          "height": 46
+        },
+        "next": {
+          "top": 785.5,
+          "right": 1271,
+          "bottom": 831.5,
+          "left": 1066,
+          "width": 205,
+          "height": 46
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 1
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\work-model-desktop-1440x900.png"
+    },
+    {
+      "viewport": {
+        "name": "desktop-1440x900",
+        "width": 1440,
+        "height": 900
+      },
+      "screen": 7,
+      "name": "assessment-coverage",
+      "metrics": {
+        "title": "Assessment coverage",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "scrollWidth": 1440,
+        "scrollHeight": 900,
+        "panel": {
+          "top": 121,
+          "right": 1300,
+          "bottom": 841,
+          "left": 140,
+          "width": 1160,
+          "height": 720
+        },
+        "footer": {
+          "top": 776,
+          "right": 1299,
+          "bottom": 840,
+          "left": 141,
+          "width": 1158,
+          "height": 64
+        },
+        "back": {
+          "top": 785.5,
+          "right": 319,
+          "bottom": 831.5,
+          "left": 169,
+          "width": 150,
+          "height": 46
+        },
+        "next": {
+          "top": 785.5,
+          "right": 1271,
+          "bottom": 831.5,
+          "left": 1066,
+          "width": 205,
+          "height": 46
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 1
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\assessment-coverage-desktop-1440x900.png"
+    },
+    {
+      "viewport": {
+        "name": "desktop-1440x900",
+        "width": 1440,
+        "height": 900
+      },
+      "screen": 8,
+      "name": "owner-information",
+      "metrics": {
+        "title": "What is your role in the organization?",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "scrollWidth": 1440,
+        "scrollHeight": 900,
+        "panel": {
+          "top": 121,
+          "right": 1300,
+          "bottom": 841,
+          "left": 140,
+          "width": 1160,
+          "height": 720
+        },
+        "footer": {
+          "top": 776,
+          "right": 1299,
+          "bottom": 840,
+          "left": 141,
+          "width": 1158,
+          "height": 64
+        },
+        "back": {
+          "top": 785.5,
+          "right": 319,
+          "bottom": 831.5,
+          "left": 169,
+          "width": 150,
+          "height": 46
+        },
+        "next": {
+          "top": 785.5,
+          "right": 1271,
+          "bottom": 831.5,
+          "left": 1066,
+          "width": 205,
+          "height": 46
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 0
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\owner-information-desktop-1440x900.png"
+    },
+    {
+      "viewport": {
+        "name": "desktop-1440x900",
+        "width": 1440,
+        "height": 900
+      },
+      "screen": 9,
+      "name": "review",
+      "metrics": {
+        "title": "Review your workspace",
+        "pathname": "/qa-onboarding",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "scrollWidth": 1440,
+        "scrollHeight": 900,
+        "panel": {
+          "top": 121,
+          "right": 1300,
+          "bottom": 841,
+          "left": 140,
+          "width": 1160,
+          "height": 720
+        },
+        "footer": {
+          "top": 776,
+          "right": 1299,
+          "bottom": 840,
+          "left": 141,
+          "width": 1158,
+          "height": 64
+        },
+        "back": {
+          "top": 785.5,
+          "right": 319,
+          "bottom": 831.5,
+          "left": 169,
+          "width": 150,
+          "height": 46
+        },
+        "next": {
+          "top": 785.5,
+          "right": 1271,
+          "bottom": 831.5,
+          "left": 1066,
+          "width": 205,
+          "height": 46
+        },
+        "horizontalOutside": [],
+        "backVisible": true,
+        "nextVisible": true,
+        "footerInsideLaptop": true,
+        "panelInsideLaptop": true,
+        "horizontalOverflow": false,
+        "selectedRadios": 0
+      },
+      "failures": [],
+      "capture": "C:\\Users\\HP\\Documents\\NormCore\\qa\\onboarding-remaining\\review-desktop-1440x900.png"
+    },
+    {
+      "name": "interaction-and-persistence",
+      "interaction": {
+        "title": "Work model",
+        "saved": "internal",
+        "currentScreen": 5,
+        "backSelection": "Yes: Internal development team"
+      },
+      "conditionalFields": 2,
+      "frenchTitle": "Développement logiciel",
+      "failures": []
+    }
+  ]
+}
