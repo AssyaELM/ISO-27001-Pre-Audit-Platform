@@ -1,0 +1,21 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import { INFORMATION_SECURITY_POLICY_SPEC, INFORMATION_SECURITY_POLICY_TEMPLATE_VERSION, prepareInformationSecurityPolicyContext, validateInformationSecurityPolicySpec } from "../lib/ai-documents/information-security-policy.ts";
+
+assert.equal(INFORMATION_SECURITY_POLICY_SPEC.documentType, "information_security_policy");
+assert.equal(INFORMATION_SECURITY_POLICY_SPEC.sections.length, 16);
+assert.deepEqual(INFORMATION_SECURITY_POLICY_SPEC.sections.map((section) => section.order), Array.from({ length: 16 }, (_, index) => index + 1));
+assert.deepEqual(validateInformationSecurityPolicySpec(), []);
+assert.ok(INFORMATION_SECURITY_POLICY_SPEC.forbiddenInferences.includes("CISO"));
+assert.ok(INFORMATION_SECURITY_POLICY_SPEC.forbiddenInferences.includes("applicable laws"));
+assert.ok(INFORMATION_SECURITY_POLICY_SPEC.forbiddenInferences.includes("review frequency"));
+const prepared = prepareInformationSecurityPolicyContext({ workspaceId: "workspace", workspace: { organizationName: "Real Organization" }, documentSetup: { document_classification: "Internal", approver: "Real approver", policy_owner: "Real owner", review_plan: "Real planned review", security_objectives: ["Real objective"], security_roles: ["Real role"], legal_requirements: ["Real requirement"] }, registry: [{ documentType: "access_control_policy", status: "finalized" }] });
+assert.equal(prepared.templateVersion, INFORMATION_SECURITY_POLICY_TEMPLATE_VERSION);
+assert.equal(prepared.knownInputs.organization_name, "Real Organization");
+assert.deepEqual(prepared.missingInputs, []);
+assert.deepEqual(prepared.knownInputs.policy_framework_documents, ["access_control_policy"]);
+const missing = prepareInformationSecurityPolicyContext({ workspaceId: "workspace" });
+for (const id of ["organization_name", "document_classification", "approver", "policy_owner", "review_plan", "security_objectives", "security_roles", "legal_requirements"]) assert.ok(missing.missingInputs.includes(id));
+const source = fs.readFileSync(new URL("../lib/ai-documents/information-security-policy.ts", import.meta.url), "utf8");
+assert.doesNotMatch(source, /openai|gemini|claude|embedding|ocr|completion|provider/i);
+console.log("Information Security Policy template QA: PASS");

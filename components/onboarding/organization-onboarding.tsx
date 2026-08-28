@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import { NormCoreLogo } from "@/components/branding/normcore-logo";
 import { useRouter } from "next/navigation";
 import { useStoredLanguage } from "@/components/language-preference";
 import {
@@ -105,6 +106,64 @@ function isSavedState(value: unknown): value is Partial<OrganizationState> {
   return typeof value === "object" && value !== null;
 }
 
+function record(value: unknown): Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
+function string(value: unknown) {
+  return typeof value === "string" ? value : "";
+}
+
+function savedState(value: unknown): Partial<OrganizationState> {
+  const root = record(value);
+  const organization = record(root.organization);
+  const environment = record(root.operating_environment);
+  const scope = record(root.assessment_scope);
+  const owner = record(root.assessment_owner);
+  const currentScreen = Number(root.current_screen);
+  return {
+    organizationName: string(organization.organization_name),
+    companySize: string(organization.company_size) as OrganizationSize | "",
+    companySizeSelectedByUser: organization.company_size_selected_by_user === true,
+    countryCode: string(organization.primary_country),
+    industryId: string(organization.industry) as IndustryId | "",
+    otherIndustry: string(organization.other_industry),
+    softwareDevelopment: string(environment.software_development) as SoftwareDevelopmentId | "",
+    workModel: string(environment.work_model) as WorkModelId | "",
+    assessmentScope: string(scope.coverage) as AssessmentScopeId | "",
+    scopeName: string(scope.scope_name),
+    scopeDescription: string(scope.description),
+    ownerName: string(owner.full_name),
+    ownerEmail: string(owner.email),
+    ownerRole: string(owner.role) as AssessmentOwnerRoleId | "",
+    otherOwnerRole: string(owner.other_role),
+    workspaceCreationId: string(root.workspace_creation_id),
+    workspaceCreatedAt: string(root.workspace_created_at),
+    currentScreen: Number.isFinite(currentScreen) ? Math.min(8, Math.max(0, currentScreen)) : 0,
+    completed: root.completed === true,
+  };
+}
+
+function readLocalState(key: string): Partial<OrganizationState> {
+  try {
+    const parsed: unknown = JSON.parse(window.localStorage.getItem(key) ?? "{}");
+    return isSavedState(parsed) ? parsed : {};
+  } catch {
+    window.localStorage.removeItem(key);
+    return {};
+  }
+}
+
+function localAuthEmail() {
+  try {
+    return window.localStorage.getItem("normcore-local-auth-email")?.trim().toLowerCase() ?? "";
+  } catch {
+    return "";
+  }
+}
+
 function normalizeCountrySearch(value: string, language: "en" | "fr") {
   return value
     .normalize("NFD")
@@ -126,6 +185,7 @@ export function OrganizationOnboarding() {
   const copy = onboardingCopy[language];
   const remainingCopy = remainingOnboardingCopy[language];
   const [state, setState] = useState<OrganizationState>(initialState);
+  const [accountStorageKey, setAccountStorageKey] = useState("");
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -164,82 +224,70 @@ export function OrganizationOnboarding() {
   const globalStep = state.currentScreen <= 3 ? 1 : state.currentScreen <= 5 ? 2 : Math.min(5, state.currentScreen - 3);
 
   useEffect(() => {
+    if (ready) return;
     let cancelled = false;
 
-    queueMicrotask(() => {
-      if (cancelled) return;
-
-      try {
-        const stored = window.localStorage.getItem(storageKey);
-        if (stored) {
-          const parsed: unknown = JSON.parse(stored);
-          if (isSavedState(parsed)) {
-            const hasRecordedCompanySize = parsed.companySizeSelectedByUser === true
-              && organizationSizes.includes(parsed.companySize as OrganizationSize);
-            const legacyOrganizationCompletion = parsed.completed === true && !("softwareDevelopment" in parsed);
-            setState((current) => ({
-              ...current,
-              ...parsed,
-              companySize: hasRecordedCompanySize ? parsed.companySize as OrganizationSize : "",
-              companySizeSelectedByUser: hasRecordedCompanySize,
-              currentScreen: legacyOrganizationCompletion
-                ? 4
-                : Math.min(8, Math.max(0, Number(parsed.currentScreen) || 0)),
-              completed: legacyOrganizationCompletion ? false : parsed.completed === true,
-            }));
-          }
-        }
-      } catch {
-        window.localStorage.removeItem(storageKey);
-      } finally {
-        setReady(true);
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!ready || profileStatus !== "idle") return;
-    let cancelled = false;
-
-    async function loadProfile() {
+    async function restoreOnboarding() {
       if (!isSupabaseConfigured()) {
+        if (!cancelled) setState((current) => ({ ...current, ...readLocalState(storageKey) }));
         setProfileStatus("empty");
+        setReady(true);
         return;
       }
 
       setProfileStatus("loading");
       try {
-        const { data, error: profileError } = await createClient().auth.getUser();
+        const client = createClient();
+        const { data: sessionData, error: profileError } = await client.auth.getSession();
         if (cancelled) return;
         if (profileError) throw profileError;
+        const user = sessionData.session?.user || (await client.auth.getUser()).data.user;
+        if (!user) throw new Error("Authentication required");
 
-        const fullName = String(data.user?.user_metadata?.full_name ?? "").trim();
-        const email = String(data.user?.email ?? "").trim();
+        const fullName = String(user.user_metadata?.full_name ?? "").trim();
+        const email = String(user.email ?? "").trim();
+        const userId = user.id ?? "";
+        const userStorageKey = userId ? `${storageKey}:${userId}` : email ? `${storageKey}:${email}` : storageKey;
+        const remote = savedState(user.user_metadata?.normcore_onboarding);
+        if (remote.completed) {
+          router.replace("/dashboard");
+          return;
+        }
+        const local = readLocalState(userStorageKey);
+        setAccountStorageKey(userStorageKey);
         setState((current) => ({
           ...current,
-          ownerName: current.ownerName || fullName,
-          ownerEmail: email || current.ownerEmail,
+          ...local,
+          ...remote,
+          ownerName: remote.ownerName || fullName || local.ownerName || current.ownerName,
+          ownerEmail: email || remote.ownerEmail || local.ownerEmail || current.ownerEmail,
         }));
         setProfileStatus(fullName && email ? "success" : "empty");
       } catch {
-        if (!cancelled) setProfileStatus("error");
+        if (!cancelled) {
+          const email = localAuthEmail();
+          const accountKey = email ? `${storageKey}:${email}` : storageKey;
+          const local = readLocalState(accountKey);
+          setAccountStorageKey(accountKey);
+          setState((current) => ({ ...current, ...local, ownerEmail: local.ownerEmail || email }));
+          setProfileStatus("error");
+        }
+      } finally {
+        if (!cancelled) setReady(true);
       }
     }
 
-    void loadProfile();
+    void restoreOnboarding();
     return () => {
       cancelled = true;
     };
-  }, [profileStatus, ready]);
+  }, [ready, router]);
 
   useEffect(() => {
     if (!ready) return;
-    window.localStorage.setItem(storageKey, JSON.stringify(state));
-  }, [ready, state]);
+    if (accountStorageKey) window.localStorage.setItem(accountStorageKey, JSON.stringify(state));
+    if (state.ownerEmail) window.localStorage.setItem(`${storageKey}:${state.ownerEmail.toLowerCase()}`, JSON.stringify(state));
+  }, [accountStorageKey, ready, state]);
 
   useEffect(() => {
     if (!ready) return;
@@ -347,7 +395,8 @@ export function OrganizationOnboarding() {
   }
 
   async function syncProgress(nextState: OrganizationState) {
-    window.localStorage.setItem(storageKey, JSON.stringify(nextState));
+    if (accountStorageKey) window.localStorage.setItem(accountStorageKey, JSON.stringify(nextState));
+    if (nextState.ownerEmail) window.localStorage.setItem(`${storageKey}:${nextState.ownerEmail.toLowerCase()}`, JSON.stringify(nextState));
     if (!isSupabaseConfigured()) return true;
 
     try {
@@ -397,9 +446,47 @@ export function OrganizationOnboarding() {
         },
       });
       if (updateError) throw updateError;
+      if (nextState.workspaceCreationId) {
+        await fetch("/api/workspaces/progress", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            workspaceId: nextState.workspaceCreationId,
+            currentScreen: nextState.currentScreen,
+            completed: nextState.completed,
+          }),
+        });
+      }
       return true;
     } catch {
       // Local persistence remains available if the network is temporarily unavailable.
+      return false;
+    }
+  }
+
+  async function ensureWorkspace(workspaceId: string, name: string) {
+    if (!isSupabaseConfigured()) return true;
+    try {
+      const supabase = createClient();
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData.user) return false;
+      const { data: existing, error: readError } = await supabase
+        .from("workspaces")
+        .select("id, owner_id")
+        .eq("id", workspaceId)
+        .maybeSingle();
+      if (readError) throw readError;
+      if (existing && existing.owner_id !== userData.user.id) return false;
+      if (!existing) {
+        const { error: insertError } = await supabase.from("workspaces").insert({
+          id: workspaceId,
+          name: name.trim() || "Workspace",
+          owner_id: userData.user.id,
+        });
+        if (insertError) throw insertError;
+      }
+      return true;
+    } catch {
       return false;
     }
   }
@@ -487,6 +574,11 @@ export function OrganizationOnboarding() {
       return;
     }
 
+    if (state.completed && state.workspaceCreationId) {
+      router.push("/dashboard");
+      return;
+    }
+
     setSaving(true);
     const workspaceIdentity = ensureWorkspaceIdentity(
       state,
@@ -500,10 +592,21 @@ export function OrganizationOnboarding() {
       completed: true,
     };
     setState(nextState);
+    const workspaceEnsured = await ensureWorkspace(nextState.workspaceCreationId, nextState.organizationName);
+    if (!workspaceEnsured) {
+      setSaving(false);
+      setError(remainingCopy.saveError);
+      return;
+    }
     const synchronized = await syncProgress(nextState);
     setSaving(false);
-    if (synchronized) setNotice(remainingCopy.workspaceCreated);
-    else setError(remainingCopy.saveError);
+    if (synchronized) {
+      setNotice(remainingCopy.workspaceCreated);
+      setState(nextState);
+      router.push("/dashboard");
+    } else {
+      setError(remainingCopy.saveError);
+    }
   }
 
   async function handleBack() {
@@ -514,7 +617,10 @@ export function OrganizationOnboarding() {
     }
 
     const nextScreen = state.currentScreen - 1;
-    const nextState = { ...state, currentScreen: nextScreen, completed: false };
+    // Never downgrade a completed onboarding. If the user somehow reached this
+    // path after finishing onboarding, preserve completed=true so that Supabase
+    // is not overwritten with false.
+    const nextState = { ...state, currentScreen: nextScreen, completed: state.completed ? true : false };
     setError("");
     setNotice("");
     if (nextScreen === 2) setCountryOpen(false);
@@ -539,7 +645,7 @@ export function OrganizationOnboarding() {
     <main className="onboarding-page" aria-busy={!ready}>
       <header className="onboarding-header">
         <button className="onboarding-logo" type="button" onClick={() => router.push("/")} aria-label="NormCore home">
-          <MockupCrop src={organizationMockup} x={41} y={32} width={218} height={58} priority />
+          <NormCoreLogo width={190} height={52} priority />
         </button>
 
         <div className="onboarding-global-progress" aria-label={remainingCopy.step(globalStep)}>
@@ -1056,7 +1162,7 @@ export function OrganizationOnboarding() {
               className="onboarding-continue"
               type="button"
               onClick={handleContinue}
-              disabled={!ready || !currentValueIsValid() || saving || state.completed}
+              disabled={!ready || !currentValueIsValid() || saving}
             >
               {state.currentScreen === 8
                 ? saving ? remainingCopy.creatingWorkspace : state.completed ? remainingCopy.workspaceCreated : remainingCopy.createWorkspace

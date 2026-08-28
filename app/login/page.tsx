@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ verified?: string }> }) {
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ verified?: string; next?: string }> }) {
   const params = await searchParams;
-  return <AuthPage mode="login" verified={params.verified === "1"} />;
+  return <AuthPage mode="login" verified={params.verified === "1"} nextPath={params.next} />;
 }

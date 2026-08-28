@@ -1,0 +1,925 @@
+DÉBUT DU PROMPT CODEX
+
+Implémente uniquement la couche métier/backend du contrôle :
+
+ISO/IEC 27001:2022 — Annex A.6.6
+Confidentiality or non-disclosure agreements
+
+Projet : NormCore
+
+Cette consigne textuelle est complète et figée. Elle remplace tous les attachements précédents devenus inaccessibles.
+
+Ne reformule pas les questions.
+Ne modifie pas A.6.1 à A.6.5.
+Ne commence pas A.6.7.
+
+1. Périmètre strict
+
+Implémenter uniquement :
+
+le catalogue bilingue A.6.6 ;
+les métadonnées, aides et preuves suggérées ;
+la résolution de la question conditionnelle ;
+les outcomes dérivés des réponses ;
+les gaps partiels et complets ;
+les clarifications ;
+les remédiations bilingues ;
+l’avertissement juridique ;
+un plan unique A.6.6 ;
+les fonctions métier pures ;
+les tests QA ciblés.
+
+Ne pas :
+
+modifier React, le dashboard, les pages ou la landing page ;
+modifier l’onboarding ;
+créer ou modifier une route API ;
+créer une migration ou une table Supabase ;
+écrire dans assessment_responses ;
+créer un registre de NDA en base ;
+créer un système de signature électronique ;
+intégrer DocuSign, Adobe Sign ou un autre outil ;
+créer un upload de preuves ;
+modifier A.6.1, A.6.2, A.6.3, A.6.4 ou A.6.5 ;
+commencer A.6.7 ou A.6.8.
+
+Inspecte les implémentations A.6.1 à A.6.5 avant de coder et réutilise leurs types, helpers, outcomes, validation de not_applicable, logique de résolution conditionnelle et dérivation de plan. Ne crée pas un moteur parallèle.
+
+2. Catalogue exact
+
+Créer exactement quatre questions :
+
+Questions principales :
+
+p6_6_001
+p6_6_002
+p6_6_003
+
+Question conditionnelle :
+
+p6_6_004_external
+
+Il doit toujours y avoir trois questions principales et zéro ou une question conditionnelle visible.
+
+Ne créer aucune autre question A.6.6.
+
+3. Question p6_6_001
+id: "p6_6_001"
+type: "policy_process"
+status: "main"
+
+Titre FR :
+
+Besoins et critères définis
+
+Titre EN :
+
+Defined confidentiality requirements and criteria
+
+Question FR exacte :
+
+Votre organisation a-t-elle défini dans quelles situations un accord de confidentialité ou de non-divulgation est requis, ainsi que le contenu adapté aux informations, aux rôles et aux relations concernées ?
+
+Question EN exacte :
+
+Has your organization defined when a confidentiality or non-disclosure agreement is required and the content appropriate to the information, roles, and relationships concerned?
+
+Aide FR :
+
+Le processus doit permettre d’identifier :
+
+les informations nécessitant une protection contractuelle ;
+les populations et relations concernées ;
+les situations dans lesquelles un accord est requis ;
+si une clause intégrée à un contrat est suffisante ou si un accord autonome est nécessaire ;
+les modèles et clauses adaptés ;
+les fonctions chargées de leur approbation ;
+les événements déclenchant une révision.
+
+Les critères peuvent dépendre de la classification des informations, du rôle, du niveau d’accès, de la relation contractuelle, du pays, des obligations clients et du droit applicable.
+
+Un NDA autonome n’est pas obligatoire dans tous les cas. Une clause de confidentialité intégrée peut être appropriée.
+
+Help EN:
+
+The process should identify:
+
+information requiring contractual protection;
+relevant populations and relationships;
+circumstances requiring an agreement;
+whether an incorporated clause is sufficient or a standalone agreement is needed;
+appropriate templates and clauses;
+approval responsibilities;
+events triggering review.
+
+Criteria may depend on information classification, role, access, contractual relationship, jurisdiction, customer obligations, and applicable law.
+
+A standalone NDA is not required in every case. An incorporated confidentiality clause may be appropriate.
+
+Preuves suggérées FR :
+
+politique de confidentialité ;
+procédure de gestion des accords ;
+critères de nécessité ;
+matrice rôle–information–accord ;
+classification de l’information ;
+modèles de clauses ou d’accords ;
+validation juridique ;
+historique des versions ;
+règles de révision ;
+registre des exceptions.
+
+Suggested evidence EN:
+
+confidentiality policy;
+agreement-management procedure;
+necessity criteria;
+role-information-agreement matrix;
+information-classification scheme;
+agreement or clause templates;
+legal approval;
+version history;
+review rules;
+exception register.
+4. Question p6_6_002
+id: "p6_6_002"
+type: "application"
+status: "main"
+
+Titre FR :
+
+Signature et contenu adapté
+
+Titre EN :
+
+Appropriate content and execution
+
+Question FR exacte :
+
+Lorsque cela est requis, les personnes concernées signent-elles un accord approprié avant l’accès ou la divulgation des informations, avec des obligations adaptées à la relation et au droit applicable ?
+
+Question EN exacte :
+
+Where required, do the relevant people sign an appropriate agreement before accessing or receiving the information, with obligations suited to the relationship and applicable law?
+
+Aide FR :
+
+Selon le contexte, l’accord peut couvrir :
+
+la définition des informations confidentielles ;
+le périmètre et les utilisations autorisées ;
+les restrictions de divulgation ;
+les responsabilités de protection ;
+les informations appartenant à des tiers ;
+le signalement d’une divulgation ou violation ;
+la restitution, suppression ou destruction ;
+les obligations postérieures à la relation ;
+les conséquences ou recours applicables ;
+le droit applicable.
+
+L’accord peut être signé physiquement, électroniquement ou accepté par une autre méthode juridiquement valable. Aucun outil de signature particulier ne doit être imposé.
+
+Help EN:
+
+Depending on the context, the agreement may cover:
+
+the definition of confidential information;
+scope and permitted use;
+disclosure restrictions;
+protection responsibilities;
+third-party information;
+reporting unauthorized disclosure or breach;
+return, deletion, or destruction;
+post-relationship duties;
+applicable remedies;
+governing law.
+
+The agreement may be signed physically, electronically, or accepted through another legally valid method. No particular signature tool should be required.
+
+Preuves suggérées FR :
+
+modèle approuvé ;
+contrat avec clause de confidentialité ;
+NDA autonome lorsqu’il est nécessaire ;
+exemple expurgé d’un accord signé ;
+preuve d’acceptation ;
+métadonnées de signature lorsqu’elles existent ;
+checklist d’onboarding ou de contractualisation ;
+registre des accords manquants ;
+exceptions approuvées ;
+validation juridique.
+
+Suggested evidence EN:
+
+approved template;
+contract containing a confidentiality clause;
+standalone NDA where required;
+redacted executed agreement;
+acceptance evidence;
+signature metadata where available;
+onboarding or contracting checklist;
+missing-agreement register;
+approved exceptions;
+legal approval.
+5. Question p6_6_003
+id: "p6_6_003"
+type: "proof_traceability"
+status: "main"
+
+Titre FR :
+
+Registre et révision
+
+Titre EN :
+
+Register and review
+
+Question FR exacte :
+
+Votre organisation conserve-t-elle un registre traçable des accords signés et les réexamine-t-elle lorsqu’un changement de relation, d’information, de risque, de politique ou de droit peut affecter leur adéquation ?
+
+Question EN exacte :
+
+Does your organization retain a traceable register of signed agreements and review them when changes in relationships, information, risk, policy, or law may affect their adequacy?
+
+Aide FR :
+
+Le registre peut notamment conserver :
+
+la personne ou l’entité concernée ;
+la catégorie de relation ;
+le type d’accord ou de clause ;
+le modèle et sa version ;
+le périmètre couvert ;
+les dates de transmission, signature et entrée en vigueur ;
+la date d’expiration lorsqu’elle existe ;
+le propriétaire et le statut ;
+les exceptions ;
+l’historique de révision ou de remplacement.
+
+La révision peut être périodique selon une fréquence proportionnée ou déclenchée par un changement de rôle, de relation, de périmètre, de classification, de politique, de loi, de contrat ou par un incident.
+
+Ne pas imposer une revue annuelle universelle.
+
+Help EN:
+
+The register may retain:
+
+the relevant person or entity;
+relationship category;
+agreement or clause type;
+template and version;
+covered scope;
+transmission, signature, and effective dates;
+expiration date where applicable;
+owner and status;
+exceptions;
+review or replacement history.
+
+Review may occur periodically at a proportionate frequency or be triggered by a change in role, relationship, scope, classification, policy, law, contract, or an incident.
+
+Do not impose a universal annual review.
+
+Preuves suggérées FR :
+
+registre des accords ;
+liste des signataires ;
+versions et dates ;
+date de signature ou d’acceptation ;
+périmètre couvert ;
+échéance lorsqu’elle existe ;
+statut de chaque accord ;
+historique de revue ;
+compte rendu de revue juridique ;
+preuve d’avenant ou de remplacement ;
+registre des exceptions ;
+règles d’accès et de conservation.
+
+Suggested evidence EN:
+
+agreement register;
+signatory list;
+versions and dates;
+signature or acceptance date;
+covered scope;
+expiration where applicable;
+agreement status;
+review history;
+legal review record;
+amendment or replacement evidence;
+exception register;
+access and retention rules.
+6. Question conditionnelle p6_6_004_external
+id: "p6_6_004_external"
+type: "conditional"
+conditionKey: "hasRelevantExternalParties"
+
+Titre FR :
+
+Parties externes pertinentes
+
+Titre EN :
+
+Relevant external parties
+
+Question FR exacte :
+
+Les consultants, fournisseurs, partenaires et autres parties externes qui accèdent à des informations confidentielles sont-ils couverts par des accords adaptés et démontrables ?
+
+Question EN exacte :
+
+Are consultants, suppliers, partners, and other external parties that access confidential information covered by appropriate and demonstrable agreements?
+
+Aide FR :
+
+Les parties externes peuvent comprendre :
+
+consultants ;
+freelances ;
+travailleurs temporaires ;
+fournisseurs et sous-traitants ;
+partenaires commerciaux ;
+membres externes de conseils ou comités ;
+visiteurs recevant des informations confidentielles ;
+participants à un projet commun ;
+investisseurs ou acquéreurs potentiels.
+
+La protection peut prendre la forme d’une clause contractuelle, d’un NDA autonome, d’un accord mutuel ou d’un engagement spécifique.
+
+Elle doit être proportionnée aux informations, accès, risques, juridictions, sous-traitants et obligations applicables.
+
+Help EN:
+
+External parties may include:
+
+consultants;
+freelancers;
+temporary workers;
+suppliers and subcontractors;
+business partners;
+external board or committee members;
+visitors receiving confidential information;
+joint-project participants;
+potential investors or acquirers.
+
+Protection may take the form of a contractual clause, standalone NDA, mutual NDA, or specific undertaking.
+
+It should be proportionate to the information, access, risks, jurisdictions, subcontractors, and applicable obligations.
+
+Preuves suggérées FR :
+
+registre des parties externes ;
+contrats fournisseurs ;
+accords de prestation ;
+NDA mutuels ou unilatéraux ;
+clauses de confidentialité ;
+liste des sous-traitants ;
+preuve de signature ou d’acceptation ;
+checklist fournisseur ;
+correspondance entre accès et accord ;
+registre des exceptions ;
+preuve de révision ou renouvellement ;
+exemple expurgé.
+
+Suggested evidence EN:
+
+external-party register;
+supplier contracts;
+service agreements;
+mutual or one-way NDAs;
+confidentiality clauses;
+subcontractor list;
+signature or acceptance evidence;
+supplier checklist;
+mapping between access and agreement;
+exception register;
+review or renewal evidence;
+redacted sample.
+7. Contexte conditionnel
+
+Ne crée aucune question de contexte visible et ne modifie pas l’onboarding.
+
+Réutiliser ContextDecision s’il existe :
+
+type ContextDecision = "yes" | "no" | "not_sure";
+
+type A66AssessmentContext = {
+  hasRelevantExternalParties?: ContextDecision;
+};
+
+Créer une fonction pure :
+
+resolveConfidentialityAgreementsQuestions(context)
+
+Résultat attendu :
+
+type A66QuestionResolution = {
+  questionIds: ConfidentialityAgreementsQuestionId[];
+  unresolvedConditions: Array<"hasRelevantExternalParties">;
+  hiddenQuestionIds: ConfidentialityAgreementsQuestionId[];
+};
+
+Toujours sélectionner :
+
+p6_6_001
+p6_6_002
+p6_6_003
+
+Règles :
+
+hasRelevantExternalParties = yes
+→ ajouter p6_6_004_external
+
+hasRelevantExternalParties = no
+→ masquer p6_6_004_external
+→ ne pas créer not_applicable
+
+hasRelevantExternalParties = not_sure ou absent
+→ masquer provisoirement p6_6_004_external
+→ ajouter hasRelevantExternalParties à unresolvedConditions
+
+Une question masquée :
+
+ne génère aucun outcome ;
+ne génère aucun gap ;
+ne génère aucune clarification ;
+ne génère aucune remédiation ;
+ne compte pas dans le total évalué ;
+ignore toute ancienne réponse associée.
+8. Réponses et outcomes
+
+Réutiliser exactement :
+
+implemented
+partially_implemented
+not_implemented
+not_sure
+not_applicable
+
+Ne pas ajouter not_assessed comme réponse sélectionnable.
+
+Mappings :
+
+implemented
+→ gapLevel: no_gap
+→ reviewState: none
+→ aucune action
+→ evidenceStatus conservé
+→ défaut sans preuve : not_provided
+
+partially_implemented
+→ gapLevel: partial_gap
+→ gap partiel associé
+→ action associée
+
+not_implemented
+→ gapLevel: full_gap
+→ gap complet associé
+→ action associée
+
+not_sure
+→ gapLevel: no_gap
+→ reviewState: clarification_required
+→ clarification uniquement
+→ aucune action
+
+not_applicable
+→ gapLevel: no_gap
+→ reviewState: applicability_review_required
+→ justification non vide après trim obligatoire
+→ aucune action
+→ aucun gap actif
+
+Conserver exactement les evidence statuses :
+
+not_provided
+provided
+validated
+rejected
+9. Plan unique
+
+Plan code exact :
+
+A6_6_CONFIDENTIALITY_AGREEMENTS_PLAN
+
+Titre FR :
+
+Définir, obtenir, tracer et maintenir les accords de confidentialité adaptés aux besoins de protection de l’information
+
+Titre EN :
+
+Define, obtain, track, and maintain confidentiality agreements appropriate to information-protection needs
+
+Créer exactement quatre sous-actions :
+
+P6.6-A01
+P6.6-A02
+P6.6-A03
+P6.6-A04
+10. Mappings exacts
+p6_6_001
+partial: A6_6_REQUIREMENTS_PARTIAL
+full: A6_6_REQUIREMENTS_ABSENT
+action: P6.6-A01
+
+p6_6_002
+partial: A6_6_EXECUTION_PARTIAL
+full: A6_6_EXECUTION_ABSENT
+action: P6.6-A02
+
+p6_6_003
+partial: A6_6_REGISTER_REVIEW_PARTIAL
+full: A6_6_REGISTER_REVIEW_ABSENT
+action: P6.6-A03
+
+p6_6_004_external
+partial: A6_6_EXTERNAL_COVERAGE_PARTIAL
+full: A6_6_EXTERNAL_COVERAGE_ABSENT
+action: P6.6-A04
+11. Remédiation P6.6-A01
+
+Source : p6_6_001
+
+Gap partiel :
+
+A6_6_REQUIREMENTS_PARTIAL
+Besoins de confidentialité partiellement définis
+Partially defined confidentiality requirements
+
+Description FR :
+
+L’organisation dispose de certains modèles ou clauses, mais elle n’a pas entièrement défini les informations, populations, relations, critères, responsables ou situations nécessitant un accord adapté.
+
+Gap complet :
+
+A6_6_REQUIREMENTS_ABSENT
+Besoins et critères de confidentialité non définis
+Confidentiality requirements and criteria are not defined
+
+Description FR :
+
+L’organisation ne dispose d’aucun processus permettant d’identifier les situations nécessitant un accord de confidentialité ou de déterminer son contenu approprié.
+
+Priorités :
+
+partial: medium
+full: high
+
+Owner :
+
+Legal / Information Security / HR / Data Owners
+
+Remédiation FR :
+
+identifier les informations à protéger ;
+les relier à la classification ;
+identifier les populations et relations ;
+définir les critères déclencheurs ;
+distinguer clauses intégrées et accords autonomes ;
+définir les modèles et clauses minimales ;
+identifier les juridictions ;
+attribuer les responsabilités ;
+définir les événements de révision ;
+traiter les exceptions ;
+faire valider et versionner les modèles.
+
+Clôture FR :
+
+Une matrice ou procédure approuvée relie les informations, rôles et relations aux types d’accords et clauses requis.
+
+Clarification FR :
+
+Demander au juridique et à la sécurité quelles relations nécessitent un accord de confidentialité, quels modèles sont approuvés et comment ils sont choisis.
+
+12. Remédiation P6.6-A02
+
+Source : p6_6_002
+
+Gap partiel :
+
+A6_6_EXECUTION_PARTIAL
+Signature ou contenu des accords incomplets
+Incomplete execution or content of confidentiality agreements
+
+Description FR :
+
+Des accords sont utilisés, mais certaines populations ne sont pas couvertes, certaines signatures ou acceptations manquent, les accords ne sont pas toujours conclus au moment approprié ou leur contenu n’est pas adapté au risque et à la relation.
+
+Gap complet :
+
+A6_6_EXECUTION_ABSENT
+Accords requis non signés ou inexistants
+Required confidentiality agreements are missing or not executed
+
+Description FR :
+
+Les personnes concernées accèdent ou reçoivent des informations confidentielles sans être couvertes par un accord ou une clause appropriée lorsque celui-ci est requis.
+
+Priorités :
+
+partial: high
+full: high
+
+Owner :
+
+HR / Legal / Procurement / Contract Owner
+
+Remédiation FR :
+
+identifier les populations non couvertes ;
+comparer les accès aux accords disponibles ;
+identifier les signatures ou acceptations manquantes ;
+vérifier les modèles et versions ;
+corriger les clauses insuffisantes ;
+obtenir les accords manquants ;
+intégrer la vérification au workflow ;
+traiter les dossiers historiques et exceptions ;
+conserver la preuve d’exécution ;
+vérifier un échantillon récent.
+
+Clôture FR :
+
+Un échantillon démontre que chaque personne concernée est couverte par un accord ou une clause appropriée lorsqu’il est requis, avant l’accès ou la divulgation correspondante.
+
+Clarification FR :
+
+Comparer la liste des personnes ayant accès aux informations confidentielles avec les contrats, clauses et accords signés disponibles.
+
+13. Remédiation P6.6-A03
+
+Source : p6_6_003
+
+Gap partiel :
+
+A6_6_REGISTER_REVIEW_PARTIAL
+Registre ou révision des accords incomplets
+Incomplete agreement register or review process
+
+Description FR :
+
+Certains accords sont retrouvables, mais le registre, les métadonnées, les versions, les statuts, les échéances, les exceptions ou les révisions ne sont pas complets ou cohérents.
+
+Gap complet :
+
+A6_6_REGISTER_REVIEW_ABSENT
+Absence de registre et de révision des accords
+No confidentiality-agreement register or review process
+
+Description FR :
+
+L’organisation ne peut pas démontrer quels accords ont été conclus, par qui, dans quelle version, pour quel périmètre ou comment leur adéquation est réexaminée.
+
+Priorités :
+
+partial: medium
+full: high
+
+Owner :
+
+Legal / Records Management / HR / Privacy
+
+Remédiation FR :
+
+définir les métadonnées minimales ;
+créer ou compléter le registre ;
+enregistrer personnes, entités, types, versions et périmètres ;
+enregistrer les dates et statuts ;
+enregistrer les échéances lorsqu’elles existent ;
+définir les déclencheurs de revue ;
+documenter les décisions de maintien, modification ou remplacement ;
+contrôler les accès et la conservation ;
+suivre les exceptions ;
+vérifier un échantillon.
+
+Clôture FR :
+
+Le registre permet de retrouver les accords applicables, leur statut, leur version et les décisions de révision associées.
+
+Clarification FR :
+
+Identifier le système de référence contenant les accords, signatures, versions, statuts, échéances et décisions de révision.
+
+14. Remédiation P6.6-A04
+
+Source : p6_6_004_external
+
+Gap partiel :
+
+A6_6_EXTERNAL_COVERAGE_PARTIAL
+Couverture externe incomplète
+Incomplete external-party confidentiality coverage
+
+Description FR :
+
+Certaines parties externes sont couvertes, mais certaines catégories, relations, sous-traitants, informations, accès ou juridictions ne disposent pas d’un accord ou d’une clause appropriée et démontrable.
+
+Gap complet :
+
+A6_6_EXTERNAL_COVERAGE_ABSENT
+Parties externes pertinentes non couvertes
+Relevant external parties are not covered
+
+Description FR :
+
+Des consultants, fournisseurs, partenaires ou autres parties externes peuvent accéder à des informations confidentielles sans être couverts par des accords adaptés lorsque ceux-ci sont requis.
+
+Priorités :
+
+partial: medium
+full: high
+
+La priorité partielle peut devenir high lorsque l’écart concerne des informations sensibles, des données clients, des secrets commerciaux, des accès privilégiés ou un fournisseur critique.
+
+Owner :
+
+Procurement / Legal / Supplier Manager / Information Security
+
+Remédiation FR :
+
+inventorier les parties externes ;
+identifier celles qui reçoivent des informations confidentielles ;
+relier accès, divulgations et contrats ;
+identifier les accords ou clauses manquants ;
+choisir le type d’accord approprié ;
+obtenir les signatures ou acceptations ;
+couvrir les sous-traitants lorsque nécessaire ;
+traiter les contrats historiques ;
+suivre les changements, renouvellements et fins de relation ;
+conserver les preuves ;
+vérifier un échantillon.
+
+Clôture FR :
+
+Toutes les parties externes pertinentes sont reliées à un accord ou une clause adaptée, traçable et proportionnée aux informations et accès concernés.
+
+Clarification FR :
+
+Demander aux achats, au juridique et aux propriétaires de contrats quelles parties externes reçoivent des informations confidentielles et quels accords les couvrent.
+
+15. Dérivation du plan
+
+Créer une fonction pure :
+
+deriveConfidentialityAgreementsRemediationPlan(responses, context)
+
+Elle doit :
+
+utiliser uniquement les questions visibles ;
+ignorer les réponses des questions masquées ;
+prendre la dernière réponse par questionId ;
+ne créer aucune action pour implemented ;
+créer le gap partiel pour partially_implemented ;
+créer le gap complet pour not_implemented ;
+créer uniquement une clarification pour not_sure ;
+créer uniquement une revue d’applicabilité pour not_applicable ;
+dédupliquer les actions par actionCode ;
+retirer une action après passage à implemented ;
+mettre à jour la même action lors du passage partial → full ;
+retourner un seul plan ;
+être pure, déterministe et sans écriture en base.
+
+Résultat recommandé :
+
+{
+  planCode,
+  title,
+  activeActions,
+  clarifications,
+  applicabilityReviews,
+  unresolvedConditions
+}
+16. Garde-fous obligatoires
+
+Ne jamais imposer :
+
+un NDA autonome pour chaque personne ;
+un modèle identique pour toutes les relations ;
+une durée fixe universelle ;
+une confidentialité illimitée universelle ;
+une revue annuelle obligatoire ;
+une signature électronique obligatoire ;
+DocuSign, Adobe Sign, CLM, HRIS ou DMS ;
+un taux universel de couverture sans notion de population applicable ;
+un blocage automatique universel des accès ;
+un droit d’audit obligatoire dans tous les NDA ;
+une clause de non-concurrence ;
+une clause de propriété intellectuelle identique pour tous ;
+un NDA comme remplacement des contrôles techniques.
+
+Ne jamais conclure :
+
+absence de NDA autonome = not_implemented ;
+absence de signature électronique = not_implemented ;
+absence de revue annuelle = not_implemented ;
+utilisation de plusieurs modèles = not_implemented ;
+absence d’outil commercial = not_implemented.
+17. Avertissement juridique
+
+FR :
+
+Les accords de confidentialité, leur portée, leur durée, leur opposabilité, les obligations postérieures à la relation, les recours disponibles et les règles de conservation dépendent du pays, du statut de la personne, du droit du travail, du droit des contrats, des conventions collectives et du droit de la vie privée applicables. Les modèles et processus concernés doivent être validés par les fonctions juridiques, RH et vie privée compétentes.
+
+EN:
+
+Confidentiality agreements, their scope, duration, enforceability, post-relationship obligations, available remedies, and retention requirements depend on the country, the person’s legal status, employment law, contract law, collective agreements, and applicable privacy law. Relevant templates and processes should be reviewed by competent legal, HR, and privacy functions.
+
+NormCore ne fournit aucun conseil juridique personnalisé.
+
+18. Fichiers probables
+
+Adapter aux conventions réelles du dépôt :
+
+content/assessment/people/confidentiality-agreements.ts
+lib/assessment/confidentiality-agreements.ts
+scripts/assessment-confidentiality-agreements-qa.mjs
+package.json
+
+Étendre outcomes.ts ou remediation.ts seulement si strictement nécessaire.
+
+Ajouter :
+
+"test:assessment-confidentiality-agreements": "node scripts/assessment-confidentiality-agreements-qa.mjs"
+
+Ne pas ajouter de dépendance.
+
+19. Tests obligatoires
+
+Créer des tests couvrant au minimum :
+
+exactement quatre IDs ;
+IDs exacts ;
+trois questions principales ;
+une conditionnelle ;
+condition exacte hasRelevantExternalParties ;
+textes FR/EN exacts ;
+aides FR/EN ;
+preuves FR/EN ;
+avertissement juridique FR/EN ;
+aucune question A.6.7 ou A.6.8 ;
+sans contexte : trois principales ;
+sans contexte : condition non résolue ;
+yes : quatre questions ;
+no : conditionnelle masquée sans N/A ;
+not_sure : conditionnelle masquée et condition non résolue ;
+réponse historique cachée ignorée ;
+implemented : no gap, aucune action ;
+partially_implemented : bon gap partiel pour les quatre questions ;
+not_implemented : bon gap complet pour les quatre questions ;
+not_sure : clarification uniquement ;
+not_applicable : revue d’applicabilité uniquement ;
+justification vide ou espaces refusée ;
+evidence statuses conservés ;
+dernière réponse utilisée ;
+déduplication par actionCode ;
+retour à implemented retire l’action ;
+partial → full met à jour la même action ;
+plan code exact ;
+actions P6.6-A01 à P6.6-A04 exactes ;
+huit gap codes exacts ;
+question masquée non comptée ;
+aucun NDA autonome universel ;
+aucune durée universelle ;
+aucune revue annuelle imposée ;
+aucune signature électronique imposée ;
+aucun outil commercial imposé ;
+aucune non-concurrence imposée ;
+aucune duplication d’A.6.2 ou A.6.5 ;
+aucune modification frontend, onboarding, API ou DB.
+20. Commandes à exécuter réellement
+npm run test:assessment-confidentiality-agreements
+npm run test:assessment-post-employment-responsibilities
+npm run test:assessment-disciplinary-process
+npm run test:assessment-awareness-training
+npm run test:assessment-employment-terms
+npm run test:assessment-screening
+npm run qa:assessment-infra
+npm run typecheck
+npm run lint
+npm run build
+
+Ne déclare pas une commande réussie si elle n’a pas réellement été exécutée.
+
+21. Rapport final
+
+Rapporter uniquement :
+
+fichiers créés ou modifiés ;
+quatre IDs exacts ;
+trois questions principales ;
+question conditionnelle ;
+types et fonctions ajoutés ;
+comportement du resolver ;
+huit gap codes ;
+quatre action codes ;
+plan code ;
+mapping des cinq réponses ;
+traitement des questions masquées ;
+confirmation qu’aucun NDA universel n’est imposé ;
+confirmation qu’aucune durée ou revue annuelle universelle n’est imposée ;
+confirmation qu’aucun outil commercial n’est imposé ;
+confirmation qu’aucun frontend, onboarding, API ou schéma DB n’a été modifié ;
+résultats exacts des commandes ;
+blocages réels éventuels.
+
+Arrête-toi après A.6.6.
+Ne commence pas A.6.7.s

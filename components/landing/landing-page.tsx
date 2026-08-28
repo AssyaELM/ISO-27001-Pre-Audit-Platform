@@ -4,6 +4,7 @@ import {
   AIAssistantSection,
   AudienceSection,
   DomainsSection,
+  AnnexASection,
   FAQSection,
   FeaturesSection,
   FinalCTASection,
@@ -28,6 +29,7 @@ export function LandingPage() {
             <ProblemSection />
             <HowItWorksSection />
             <DomainsSection />
+            <AnnexASection />
             <FeaturesSection />
             <AIAssistantSection />
             <AudienceSection />

@@ -1,0 +1,9 @@
+import assert from "node:assert/strict";
+import { ACCESS_CONTROL_POLICY_DOCUMENT_TYPE, ACCESS_CONTROL_POLICY_SPEC, ACCESS_CONTROL_POLICY_TEMPLATE_VERSION, prepareAccessControlPolicyContext, validateAccessControlPolicySpec } from "../lib/ai-documents/access-control-policy.ts";
+assert.equal(ACCESS_CONTROL_POLICY_DOCUMENT_TYPE, "access_control_policy"); assert.equal(ACCESS_CONTROL_POLICY_TEMPLATE_VERSION, "1.0.0"); assert.deepEqual(validateAccessControlPolicySpec(), []);
+assert.equal(ACCESS_CONTROL_POLICY_SPEC.sections.length, 16); assert.equal(new Set(ACCESS_CONTROL_POLICY_SPEC.sections.map((s) => s.id)).size, 16); assert.equal(new Set(ACCESS_CONTROL_POLICY_SPEC.sections.map((s) => s.order)).size, 16);
+assert.ok(!JSON.stringify({ sections: ACCESS_CONTROL_POLICY_SPEC.sections, inputs: [...ACCESS_CONTROL_POLICY_SPEC.requiredInputs, ...ACCESS_CONTROL_POLICY_SPEC.optionalInputs] }).match(/Jira|ServiceNow|Okta|Azure AD|Entra|Active Directory|GitHub|GitLab|VPN requirement|MFA requirement|PAM\/JIT|annual review|quarterly review|session timeout/i));
+assert.ok(!JSON.stringify(ACCESS_CONTROL_POLICY_SPEC).match(/p5_15|p5_16|p5_17|p5_18|p8_2|p8_3|p8_4|p8_5/i));
+const result = prepareAccessControlPolicyContext({ workspaceId: "w", workspace: { organizationName: "Acme", scope: "ISMS scope", documentOwner: "owner" }, documentSetup: { document_classification: "Internal", approver: "approver", review_plan: "2027-01-01" } });
+assert.ok(!result.missingInputs.includes("organization_name")); assert.ok(!result.missingInputs.includes("policy_owner")); assert.equal(result.sectionReadiness.remote_external_third_party_access, "ready"); assert.equal(result.sectionReadiness.privileged_access, "ready"); assert.equal(Object.keys(result.sectionReadiness).length, 16);
+console.log("ACCESS CONTROL POLICY TEMPLATE QA: PASS");

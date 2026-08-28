@@ -11,21 +11,49 @@ import {
   Mail,
   UserRound,
 } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useStoredLanguage } from "@/components/language-preference";
 import { authCopy } from "@/content/auth";
-import { getAuthErrorMessage } from "@/lib/supabase/auth-errors";
-import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { resolvePostAuthDestination, resolveSafeDestination } from "@/lib/auth/destination";
+import { createClient } from "@/lib/supabase/client";
 import { AuthShell } from "./auth-shell";
 
 type AuthMode = "login" | "signup";
-type AuthPageProps = { mode: AuthMode; verified?: boolean };
+type AuthPageProps = { mode: AuthMode; verified?: boolean; nextPath?: string };
 
 const pendingEmailKey = "normcore-pending-auth-email";
 const pendingFlowKey = "normcore-pending-auth-flow";
+const workspaceStorageKey = "normcore-onboarding-organization-v1";
 
-export function AuthPage({ mode, verified = false }: AuthPageProps) {
+type AuthResult = {
+  destination?: string;
+  error?: string;
+  accessStatus?: "pending" | "rejected";
+  offlineFallback?: boolean;
+  metadata?: Record<string, unknown>;
+};
+
+function isNetworkAuthError(error: unknown) {
+  return error instanceof Error && (error.message === "fetch failed" || error.message.includes("fetch failed"));
+}
+
+function persistAuthContext(result: AuthResult, email: string) {
+  if (result.offlineFallback) {
+    window.localStorage.setItem("normcore-local-auth", "1");
+    window.localStorage.setItem("normcore-local-auth-email", email);
+  } else {
+    window.localStorage.removeItem("normcore-local-auth");
+    window.localStorage.removeItem("normcore-local-auth-email");
+  }
+
+  if (result.metadata) {
+    window.localStorage.setItem(workspaceStorageKey, JSON.stringify(result.metadata));
+    window.localStorage.setItem(`${workspaceStorageKey}:${email}`, JSON.stringify(result.metadata));
+  }
+}
+
+export function AuthPage({ mode, verified = false, nextPath }: AuthPageProps) {
   const router = useRouter();
   const { language } = useStoredLanguage();
   const copy = authCopy[language];
@@ -60,39 +88,89 @@ export function AuthPage({ mode, verified = false }: AuthPageProps) {
     }
 
     setSubmitting(true);
-    const supabase = createClient();
 
     try {
       if (isSignup) {
         const fullName = String(data.get("name") ?? "").trim();
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { data: { full_name: fullName, language } },
+        const response = await fetch("/api/auth/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password, name: fullName, language }),
         });
-
-        if (error) {
-          setMessage(getAuthErrorMessage(error, language));
+        const result = await response.json() as AuthResult;
+        if (!response.ok) {
+          setMessage(result.error ?? copy.genericError);
           setIsError(true);
           return;
         }
 
-        window.sessionStorage.setItem(pendingEmailKey, email);
-        window.sessionStorage.setItem(pendingFlowKey, "signup");
-        router.push("/check-email?flow=signup");
+        if (result.destination === "/check-email?flow=signup") {
+          window.sessionStorage.setItem(pendingEmailKey, email);
+          window.sessionStorage.setItem(pendingFlowKey, "signup");
+        }
+
+        persistAuthContext(result, email);
+
+        router.push(result.destination ?? "/check-email?flow=signup");
         return;
       }
 
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        setMessage(getAuthErrorMessage(error, language));
+      let result: AuthResult;
+      let responseOk = false;
+      try {
+        // Authenticate in the browser first so the real Supabase user metadata
+        // always wins over any stale local fallback state.
+        const supabase = createClient();
+        const { data: sessionData, error: sessionError } = await supabase.auth.signInWithPassword({ email, password });
+        if (!sessionError && sessionData.user) {
+          const roleResponse = await fetch(`/api/auth/current${nextPath ? `?next=${encodeURIComponent(nextPath)}` : ""}`, { cache: "no-store" });
+          const roleResult = await roleResponse.json() as AuthResult;
+          if (!roleResponse.ok) {
+            if (roleResult.accessStatus) {
+              await supabase.auth.signOut();
+              router.replace(roleResult.destination ?? `/access-status?status=${roleResult.accessStatus}`);
+              return;
+            }
+            setMessage(roleResult.error ?? copy.genericError);
+            setIsError(true);
+            return;
+          }
+          result = {
+            destination: roleResult?.destination ?? resolvePostAuthDestination(nextPath, sessionData.user.user_metadata),
+            offlineFallback: false,
+            metadata: sessionData.user.user_metadata as Record<string, unknown>,
+          };
+          persistAuthContext(result, email);
+          router.replace(resolveSafeDestination(result.destination));
+          router.refresh();
+          return;
+        }
+        if (sessionError && !isNetworkAuthError(sessionError)) {
+          setMessage(sessionError.message || copy.genericError);
+          setIsError(true);
+          return;
+        }
+      } catch (error) {
+        if (!isNetworkAuthError(error)) throw error;
+      }
+
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, nextPath }),
+      });
+      result = await response.json() as AuthResult;
+      responseOk = response.ok;
+      if (!responseOk) {
+        setMessage(result.error ?? copy.genericError);
         setIsError(true);
         return;
       }
 
-      const requestedPath = new URLSearchParams(window.location.search).get("next");
-      const safePath = requestedPath?.startsWith("/") && !requestedPath.startsWith("//") ? requestedPath : "/onboarding";
-      router.replace(safePath);
+      persistAuthContext(result, email);
+
+      const destination = resolveSafeDestination(result.destination ?? nextPath);
+      router.replace(destination);
       router.refresh();
     } catch {
       setMessage(copy.genericError);
@@ -184,13 +262,13 @@ export function AuthPage({ mode, verified = false }: AuthPageProps) {
             <span aria-hidden="true"><Check size={12} /></span>
             {isSignup ? (
               <em>
-                {copy.termsPrefix} <Link href="/terms">{copy.terms}</Link> {copy.termsAnd}{" "}
-                <Link href="/privacy">{copy.privacy}</Link>.
+                {copy.termsPrefix} <Link prefetch={true} href="/terms">{copy.terms}</Link> {copy.termsAnd}{" "}
+                <Link prefetch={true} href="/privacy">{copy.privacy}</Link>.
               </em>
             ) : <em>{copy.remember}</em>}
           </label>
 
-          {!isSignup ? <Link className="auth-text-button" href="/forgot-password">{copy.forgot}</Link> : null}
+          {!isSignup ? <Link prefetch={true} className="auth-text-button" href="/forgot-password">{copy.forgot}</Link> : null}
         </div>
 
         <button className="auth-submit" type="submit" disabled={submitting}>
@@ -209,7 +287,7 @@ export function AuthPage({ mode, verified = false }: AuthPageProps) {
 
       <div className="auth-switch">
         <span>{isSignup ? copy.already : copy.newUser}</span>
-        <Link href={isSignup ? "/login" : "/signup"}>{isSignup ? copy.signIn : copy.createAccount}</Link>
+        <Link prefetch={true} href={isSignup ? "/login" : "/signup"}>{isSignup ? copy.signIn : copy.createAccount}</Link>
       </div>
     </AuthShell>
   );

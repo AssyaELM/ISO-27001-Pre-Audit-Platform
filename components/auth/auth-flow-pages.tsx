@@ -98,7 +98,7 @@ export function ForgotPasswordPage() {
         </button>
         <p className={`auth-form-message ${isError ? "is-error" : ""}`} aria-live="polite">{message}</p>
       </form>
-      <Link className="auth-flow-back" href="/login"><ArrowLeft size={18} />{copy.forgotPassword.back}</Link>
+      <Link prefetch={true} className="auth-flow-back" href="/login"><ArrowLeft size={18} />{copy.forgotPassword.back}</Link>
     </AuthShell>
   );
 }
@@ -254,7 +254,7 @@ export function CheckEmailPage({ flow }: { flow: EmailFlow }) {
       </form>
       <div className="auth-flow-links">
         <button type="button" onClick={changeEmail}>{copy.checkEmail.changeEmail}</button>
-        <Link href="/login"><ArrowLeft size={18} />{copy.checkEmail.back}</Link>
+        <Link prefetch={true} href="/login"><ArrowLeft size={18} />{copy.checkEmail.back}</Link>
       </div>
     </AuthShell>
   );
@@ -367,7 +367,7 @@ export function PasswordUpdatedPage() {
         title={copy.passwordUpdated.title}
         description={<p>{copy.passwordUpdated.description}</p>}
       />
-      <Link className="auth-submit auth-success-link" href="/login">{copy.passwordUpdated.button}</Link>
+      <Link prefetch={true} className="auth-submit auth-success-link" href="/login">{copy.passwordUpdated.button}</Link>
     </AuthShell>
   );
 }

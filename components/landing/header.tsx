@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLanguage } from "./language-context";
+import { NormCoreLogo } from "@/components/branding/normcore-logo";
 
 const navLinks = [
   "#product",
@@ -31,14 +32,13 @@ export function Header() {
   return (
     <header className="site-header">
       <a className="brand-lockup" href="#product" aria-label="NormCore home">
-        <span className="brand-mark" aria-hidden="true" />
-          <span>{copy.navigation.brand}</span>
+        <NormCoreLogo width={180} height={49} alt={copy.navigation.brand} priority />
       </a>
 
       <nav className="desktop-nav" aria-label="Primary navigation">
         {navLinks.map((href, index) =>
           href.startsWith("/") ? (
-            <Link key={href} href={href}>
+            <Link prefetch={true} key={href} href={href}>
               {copy.navigation.items[index]}
             </Link>
           ) : (
@@ -53,10 +53,10 @@ export function Header() {
         <button className="language-control" type="button" aria-label="Switch language" onClick={toggleLanguage}>
           {copy.navigation.language}
         </button>
-        <Link className="sign-in" href="/login">
+        <Link prefetch={true} className="sign-in" href="/login">
           {copy.navigation.signIn}
         </Link>
-        <Link className="button button-primary button-small" href="/signup">
+        <Link prefetch={true} className="button button-primary button-small" href="/signup">
           {copy.navigation.cta}
         </Link>
       </div>
@@ -76,7 +76,7 @@ export function Header() {
         <nav aria-label="Mobile navigation">
           {navLinks.map((href, index) =>
             href.startsWith("/") ? (
-              <Link key={href} href={href} onClick={() => setOpen(false)}>
+              <Link prefetch={true} key={href} href={href} onClick={() => setOpen(false)}>
                 {copy.navigation.items[index]}
               </Link>
             ) : (
@@ -88,8 +88,8 @@ export function Header() {
         </nav>
         <div className="mobile-menu-footer">
           <button type="button" onClick={toggleLanguage}>{copy.navigation.language}</button>
-          <Link href="/login" onClick={() => setOpen(false)}>{copy.navigation.signIn}</Link>
-          <Link className="button button-primary" href="/signup" onClick={() => setOpen(false)}>
+          <Link prefetch={true} href="/login" onClick={() => setOpen(false)}>{copy.navigation.signIn}</Link>
+          <Link prefetch={true} className="button button-primary" href="/signup" onClick={() => setOpen(false)}>
             {copy.navigation.cta}
           </Link>
         </div>
