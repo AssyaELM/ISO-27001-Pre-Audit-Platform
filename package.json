@@ -81,6 +81,9 @@
     "test:ai-document-multi-type-persistence": "node --experimental-strip-types scripts/ai-document-multi-type-persistence-qa.mjs",
     "test:ai-document-multi-type-live": "node --experimental-strip-types scripts/ai-document-multi-type-live-integration.mjs"
   },
+  "engines": {
+    "node": ">=18.18.0"
+  },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.111.0",

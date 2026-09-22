@@ -11,3 +11,17 @@ logs/
 .env*
 !.env.example
 !.env.assessment-test.example
+
+# Artefacts visuels et locaux
+mockups/
+design/
+output/
+qa/
+scratch/
+
+# Artefacts generes
+*.pdf
+
+# Scripts racine non essentiels
+/*.py
+/*.sql
