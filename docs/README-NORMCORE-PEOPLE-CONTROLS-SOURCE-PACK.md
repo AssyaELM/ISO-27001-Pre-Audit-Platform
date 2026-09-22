@@ -1,23 +1,23 @@
-﻿# NormCore â€” People Controls Questionnaire Source Pack (ISO/IEC 27001:2022)
+# NormCore — People Controls Questionnaire Source Pack (ISO/IEC 27001:2022)
 
-Ce fichier regroupe lâ€™ensemble du contenu que vous avez partagÃ©, sans suppression ni rÃ©interprÃ©tation, pour prÃ©parer le flux de questionnaires du thÃ¨me **People Controls (A.6)**.
+This file gathers all the content shared previously, without deletion or reinterpretation, to prepare the questionnaire flow for the **People Controls (A.6)** theme.
 
-## RÃ©fÃ©rences fournies
+## Provided References
 
-### Fichiers sources (fournis par lâ€™utilisateur)
+### Source Files (provided by the user)
 
 - `C:\Users\HP\.codex/attachments\9a4a0fc0-1609-4253-9a65-987923aa63da\pasted-text.txt`
-  - Titre visible : `Login Company Contact English Products Solutions Pricing Customers Resources Paâ€¦`
-  - Contenu dÃ©taillÃ© non visible dans le message (rÃ©fÃ©rence conservÃ©e ici).
+  - Visible title: `Login Company Contact English Products Solutions Pricing Customers Resources Pa...`
+  - Detailed content not visible in the message (reference kept here).
 - `C:\Users\HP\.codex/attachments\2b84dfee-2fca-448a-8fc9-b06f0f8c88f9\pasted-text.txt`
-  - `# Gap Assessment Scoring Guide ## ISO/IEC 27001:2022 â€” How to Score and Interprâ€¦`
-  - Contenu dÃ©taillÃ© non visible dans le message (rÃ©fÃ©rence conservÃ©e ici).
+  - `# Gap Assessment Scoring Guide ## ISO/IEC 27001:2022 — How to Score and Interpret...`
+  - Detailed content not visible in the message (reference kept here).
 - `C:\Users\HP\.codex/attachments\1ae90bdf-2a43-4b79-af6b-31dbdb60b3d9\pasted-text.txt`
-  - `# ISO/IEC 27001:2022 Gap Assessment Checklist ## ISO/IEC 27001:2022 | Clause 6.â€¦`
-  - Contenu dÃ©taillÃ© non visible dans le message (rÃ©fÃ©rence conservÃ©e ici).
+  - `# ISO/IEC 27001:2022 Gap Assessment Checklist ## ISO/IEC 27001:2022 | Clause 6....`
+  - Detailed content not visible in the message (reference kept here).
 - `C:\Users\HP\.codex/attachments\b7b0bc55-ff12-495d-a7ff-bd749cb06fb1\pasted-text.txt`
-  - `# Information Security Policy ## ISO/IEC 27001:2022 | Clause 5.2 **Document ID:â€¦`
-  - Contenu dÃ©taillÃ© non visible dans le message (rÃ©fÃ©rence conservÃ©e ici).
+  - `# Information Security Policy ## ISO/IEC 27001:2022 | Clause 5.2 **Document ID:...`
+  - Detailed content not visible in the message (reference kept here).
 - `C:\Users\HP\.codex/attachments\13af9c45-0480-427d-9e97-c1e471c6cd55\pasted-text.txt`
   - `# Legal and Regulatory Requirements Register ## ISO/IEC 27001:2022 | Clause 4.2â€¦`
   - Contenu dÃ©taillÃ© non visible dans le message (rÃ©fÃ©rence conservÃ©e ici).
