@@ -1,54 +1,88 @@
-# NormCore landing page
+# NormCore - ISO-27001 Pre-Audit Platform
 
-Premium, responsive landing page for NormCore, built with Next.js, TypeScript,
-Tailwind CSS, and a portable scroll-scrub scene controller.
+NormCore is an intelligent compliance platform designed to streamline the ISO-27001 certification journey. It offers an interactive dashboard, dynamic assessments, gap analysis, automated remediation planning, and AI-powered document generation to align an organization's policies with standard requirements.
 
-## Run locally
+## Table of Contents
 
+- [Project Overview](#project-overview)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Local Development](#local-development)
+- [Build & Production](#build--production)
+- [Documentation Directory](#documentation-directory)
+
+## Project Overview
+
+For an in-depth look at what NormCore is and its primary objectives, refer to the [Project Overview](docs/PROJECT_OVERVIEW.md).
+
+## Prerequisites
+
+- **Node.js**: `v18.18.0` or higher (Use of `.nvmrc` or `nvm` recommended).
+- **Git**: To clone the repository.
+- **Supabase**: A Supabase project (local CLI or cloud) for PostgreSQL database, Auth, and Storage.
+- **AI Providers**: At least one API key from supported LLM providers (Gemini, OpenAI, Groq, OpenRouter).
+
+## Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url> ISO-27001-Pre-Audit-Platform
+   cd ISO-27001-Pre-Audit-Platform
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+## Configuration
+
+1. **Environment Variables:**
+   Copy the example environment file and configure it:
+   ```bash
+   # On macOS/Linux:
+   cp .env.example .env.local
+
+   # On Windows (PowerShell):
+   Copy-Item .env.example .env.local
+   ```
+   Open `.env.local` and populate the keys. **Do not commit this file.**
+
+2. **Supabase Configuration:**
+   See [Database Setup](docs/DATABASE.md) and [Authentication Setup](docs/AUTHENTICATION.md) for details on migrating the schema and configuring Auth.
+
+3. **AI Configuration:**
+   See [AI Integration](docs/AI.md) for setting up Gemini or other providers for the document generation module.
+
+## Local Development
+
+Run the development server:
 ```bash
-npm install
 npm run dev
 ```
+Access the application at `http://127.0.0.1:3103` (or the URL specified in your `.env.local`).
 
-Open `http://127.0.0.1:3103`.
+## Build & Production
 
-The npm scripts invoke their JavaScript entry points directly, so the same
-commands work in PowerShell, Command Prompt, and WSL.
-
-## Validate
-
+To build the application for production:
 ```bash
-npm run typecheck
-npm run lint
 npm run build
 ```
 
-The current Architectural Matte Diorama scenes are code-rendered placeholders.
-Landing-page copy is centralized in `content/landing.ts` and the English/French
-preference is saved in the browser.
-
-## Supabase authentication
-
-Login, signup confirmation by six-digit email OTP, password recovery by OTP and
-password updates use Supabase Auth with SSR cookies. Add these public project
-values to `.env.local`:
-
+To start the production server:
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your-key
+npm start
 ```
+See [Deployment Guide](docs/DEPLOYMENT.md) for advanced hosting instructions.
 
-The forms intentionally show a configuration message until both values exist.
-Full dashboard, OTP email-template and SMTP instructions are in
-`supabase/AUTH_SETUP.md`. Never expose a service-role key or SMTP password in a
-`NEXT_PUBLIC_` variable.
+## Documentation Directory
 
-## Before production
-
-- Replace the placeholder contact addresses with monitored mailboxes.
-- Set `NEXT_PUBLIC_LEGAL_ENTITY_NAME` and review the draft legal pages with
-  qualified counsel for the target markets.
-- Document the production hosting region, subprocessors, retention period and
-  vulnerability-reporting channel.
-- Add abuse protection appropriate to the deployment platform before public
-  traffic is enabled.
+The `docs/` directory contains complete technical guides for all components of NormCore:
+- [Architecture](docs/ARCHITECTURE.md)
+- [Database & Migrations](docs/DATABASE.md)
+- [Authentication](docs/AUTHENTICATION.md)
+- [Security & Roles](docs/SECURITY.md)
+- [Workflows](docs/WORKFLOW.md)
+- [AI Capabilities](docs/AI.md)
+- [Deployment](docs/DEPLOYMENT.md)
