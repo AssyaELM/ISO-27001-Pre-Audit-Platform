@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useStoredLanguage } from "@/components/language-preference";
+import { LanguageToggle } from "@/components/language-toggle";
 import { AppSidebar } from "@/components/navigation/app-sidebar";
 import { workspaceDisplayName } from "@/lib/workspaces/display-name";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -126,7 +127,7 @@ export function AssessmentThemePage() {
         <header className={styles.topbar}>
           <div className={styles.breadcrumb}><span>{organizationLabel}</span><b>/</b><strong>{french ? "Évaluation" : "Assessment"}</strong></div>
           <div className={styles.profileTools}>
-            <span className={styles.language}>EN / FR</span>
+            <LanguageToggle className={styles.language} />
             <span className={styles.workspaceStatus}><i />{workspaceReady ? (french ? "Espace actif" : "Workspace active") : (french ? "Configuration" : "Setup")}</span>
             {profileName && <span className={styles.profileName}>{profileName}</span>}
             {profileInitial && <span className={styles.avatar}>{profileInitial}</span>}

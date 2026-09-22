@@ -48,7 +48,10 @@ export function validateSemanticWriteGate(blocks: StructuredDocumentBlock[], res
       name: "vendor/tool",
       extract: (text: string) => {
         const matches: string[] = [];
-        const vendorRegex = /\b(AWS|Azure|Google Cloud|GCP|Jira|ServiceNow|Confluence|Okta|Active Directory|Slack|Teams)\b/gi;
+        // Product/vendor names are proper nouns. Keep the check case-sensitive
+        // so ordinary policy language such as "designated teams" is not
+        // misclassified as Microsoft Teams.
+        const vendorRegex = /\b(AWS|Azure|Google Cloud|GCP|Jira|ServiceNow|Confluence|Okta|Active Directory|Slack|Teams)\b/g;
         let m;
         while ((m = vendorRegex.exec(text)) !== null) matches.push(m[1]);
         return matches;

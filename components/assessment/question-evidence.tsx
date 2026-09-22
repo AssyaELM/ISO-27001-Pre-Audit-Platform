@@ -5,10 +5,15 @@ import {
   File,
   FileSpreadsheet,
   FileText,
+  ChevronRight,
+  Info,
   Link2,
+  List,
+  MessageCircle,
   Paperclip,
   PlusCircle,
   Search,
+  Send,
   Unlink,
   Upload,
   X,
@@ -78,15 +83,19 @@ type Props = {
   guidance?: string;
 };
 
+type AskAction = "explain_question" | "explain_options" | "give_example" | "suggest_evidence" | "custom";
+type AskMessage = { role: "user" | "assistant"; text: string };
+type AskContext = { controlTitle: string; category: string; question: string };
+
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const ACCEPTED_FILES = ".pdf,.png,.jpg,.jpeg,.txt,.csv";
-const DOCUMENT_TYPE_OPTIONS: Array<{ value: DocumentType; label: string }> = [
-  { value: "information_security_policy", label: "Information Security Policy" },
-  { value: "access_control_policy", label: "Access Control Policy" },
-  { value: "incident_management_procedure", label: "Incident Management Procedure" },
-  { value: "backup_restore_procedure", label: "Backup & Restore Procedure" },
-  { value: "asset_management_policy", label: "Asset Management Policy" },
-  { value: "other", label: "Other" },
+const DOCUMENT_TYPE_OPTIONS: Array<{ value: DocumentType; en: string; fr: string }> = [
+  { value: "information_security_policy", en: "Information Security Policy", fr: "Politique de sécurité de l’information" },
+  { value: "access_control_policy", en: "Access Control Policy", fr: "Politique de contrôle d’accès" },
+  { value: "incident_management_procedure", en: "Incident Management Procedure", fr: "Procédure de gestion des incidents" },
+  { value: "backup_restore_procedure", en: "Backup & Restore Procedure", fr: "Procédure de sauvegarde et de restauration" },
+  { value: "asset_management_policy", en: "Asset Management Policy", fr: "Politique de gestion des actifs" },
+  { value: "other", en: "Other", fr: "Autre" },
 ];
 
 function formatSize(bytes: number) {
@@ -118,6 +127,11 @@ async function responseBody<T extends { error?: string }>(response: globalThis.R
 
 export function QuestionEvidence({ workspaceId, themeId, controlId, questionId, locale, guidance }: Props) {
   const fr = locale === "fr";
+  const copy = fr ? {
+    askAi: "Demander à l’IA", askAiPanel: "Panneau Demander à l’IA", askAiHelp: "Obtenez de l’aide pour cette question", closeAskAi: "Fermer Demander à l’IA", question: "Question", quickActions: "Actions rapides", explainQuestion: "Expliquer cette question", explainOptions: "Expliquer les options de réponse", giveExample: "Donner un exemple", giveAnotherExample: "Donner un autre exemple", suggestEvidence: "Quelles preuves peuvent l’étayer ?", thinking: "L’IA réfléchit…", askPlaceholder: "Poser une question…", sendQuestion: "Envoyer la question", askFooter: "L’IA explique ; vous choisissez la réponse.", notConfigured: "Demander à l’IA n’est pas encore configuré.", busy: "Demander à l’IA est momentanément occupée. Veuillez réessayer.", unavailable: "Demander à l’IA est momentanément indisponible.", max: "Max.", linkedTo: "Liée à", questions: "question", documentTypes: "Types de documents",
+  } : {
+    askAi: "Ask AI", askAiPanel: "Ask AI panel", askAiHelp: "Get help with this question", closeAskAi: "Close Ask AI", question: "Question", quickActions: "Quick actions", explainQuestion: "Explain this question", explainOptions: "Explain the answer options", giveExample: "Give me an example", giveAnotherExample: "Give me another example", suggestEvidence: "What evidence could support this?", thinking: "Ask AI is thinking…", askPlaceholder: "Ask a question...", sendQuestion: "Send question", askFooter: "Ask AI explains; you choose the answer.", notConfigured: "Ask AI is not configured yet.", busy: "Ask AI is temporarily busy. Please try again.", unavailable: "Ask AI is temporarily unavailable.", max: "Max", linkedTo: "Linked to", questions: "question", documentTypes: "Document types",
+  };
   const [items, setItems] = useState<EvidenceItem[]>([]);
   const [links, setLinks] = useState<EvidenceLink[]>([]);
   const [allItems, setAllItems] = useState<EvidenceItem[]>([]);
@@ -139,6 +153,63 @@ export function QuestionEvidence({ workspaceId, themeId, controlId, questionId, 
   const [reviewDate, setReviewDate] = useState("");
   const [documentOwnerId, setDocumentOwnerId] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
+  const [askOpen, setAskOpen] = useState(false);
+  const [askContext, setAskContext] = useState<AskContext>({ controlTitle: "", category: "", question: "" });
+  const [askMessages, setAskMessages] = useState<AskMessage[]>([]);
+  const [askInput, setAskInput] = useState("");
+  const [askLoading, setAskLoading] = useState(false);
+  const [askError, setAskError] = useState("");
+
+  useEffect(() => {
+    const closeOtherPanel = (event: Event) => {
+      const detail = (event as CustomEvent<string>).detail;
+      if (detail !== questionId) setAskOpen(false);
+    };
+    window.addEventListener("normcore:ask-ai-open", closeOtherPanel);
+    return () => window.removeEventListener("normcore:ask-ai-open", closeOtherPanel);
+  }, [questionId]);
+
+  function openAskAi(event: React.MouseEvent<HTMLButtonElement>) {
+    const article = event.currentTarget.closest("article");
+    const question = article?.querySelector("h3")?.textContent?.replace(/^\s*\d+\.\s*/, "").trim() ?? "";
+    const mainPanel = article?.closest("section");
+    const controlTitle = mainPanel?.querySelector("header h2")?.textContent?.trim() ?? controlId;
+    const category = article?.querySelector("span")?.textContent?.trim() ?? (fr ? "Question d’évaluation" : "Assessment question");
+    setAskContext({ controlTitle, category, question });
+    setAskMessages([]);
+    setAskInput("");
+    setAskError("");
+    setAskOpen(true);
+    window.dispatchEvent(new CustomEvent("normcore:ask-ai-open", { detail: questionId }));
+  }
+
+  async function ask(action: AskAction, message?: string) {
+    if (askLoading || !workspaceId) return;
+    const prompt = message?.trim() || askInput.trim();
+    if (action === "custom" && !prompt) return;
+    const visiblePrompt = message ?? prompt;
+    setAskLoading(true);
+    setAskError("");
+    setAskMessages((current) => [...current, { role: "user", text: visiblePrompt }]);
+    if (action === "custom") setAskInput("");
+    try {
+      const response = await fetch("/api/assessment/ask-ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ workspaceId, theme: themeId, controlId, questionId, question: askContext.question, action, userMessage: prompt }),
+      });
+      const body = await response.json() as { answer?: string; code?: string; error?: string };
+      if (!response.ok) {
+        setAskError(body.code === "ASK_AI_NOT_CONFIGURED" ? copy.notConfigured : body.code === "ASK_AI_BUSY" ? copy.busy : copy.unavailable);
+        return;
+      }
+      setAskMessages((current) => [...current, { role: "assistant", text: body.answer ?? copy.unavailable }]);
+    } catch {
+      setAskError(copy.unavailable);
+    } finally {
+      setAskLoading(false);
+    }
+  }
 
   const loadLinked = useCallback(async (refresh = false) => {
     if (!workspaceId) return;
@@ -299,6 +370,7 @@ export function QuestionEvidence({ workspaceId, themeId, controlId, questionId, 
       <div className={styles.actionBar}>
         {guidance && <button type="button" onClick={() => setGuidanceOpen((current) => !current)} aria-expanded={guidanceOpen}><Eye size={16} />{fr ? "Voir l’aide" : "View guidance"}</button>}
         <button type="button" disabled={!workspaceId} onClick={() => openModal("upload")}><Paperclip size={16} />{items.length ? (fr ? `Preuves · ${items.length} fichier${items.length > 1 ? "s" : ""}` : `Evidence · ${items.length} file${items.length > 1 ? "s" : ""}`) : (fr ? "Ajouter une preuve" : "Add evidence")}</button>
+        <button type="button" className={styles.askAiAction} disabled={!workspaceId} onClick={openAskAi}><MessageCircle size={16} />{copy.askAi}</button>
         {!items.length && <span className={styles.neutral}>{fr ? "Aucune preuve" : "No evidence"}</span>}
       </div>
 
@@ -317,6 +389,18 @@ export function QuestionEvidence({ workspaceId, themeId, controlId, questionId, 
 
       {error && !modalOpen && <p className={styles.error} role="alert">{error}</p>}
 
+      {askOpen && <aside className={styles.askAiPanel} aria-label={copy.askAiPanel}>
+        <header className={styles.askAiHeader}><div><MessageCircle size={24} /><span><strong>{copy.askAi}</strong><small>{copy.askAiHelp}</small></span></div><button type="button" aria-label={copy.closeAskAi} onClick={() => setAskOpen(false)}><X size={20} /></button></header>
+        <div className={styles.askAiBody}>
+          <section className={styles.askAiContext}><span>{askContext.category}</span><h2>{askContext.controlTitle}</h2><label>{copy.question}</label><p>{askContext.question}</p></section>
+          {!askMessages.length && <section className={styles.askAiQuick}><h3>{copy.quickActions}</h3><button type="button" onClick={() => void ask("explain_question", copy.explainQuestion)}><Info size={18} />{copy.explainQuestion}<ChevronRight size={17} /></button><button type="button" onClick={() => void ask("explain_options", copy.explainOptions)}><List size={18} />{copy.explainOptions}<ChevronRight size={17} /></button><button type="button" onClick={() => void ask("give_example", copy.giveExample)}><FileText size={18} />{copy.giveExample}<ChevronRight size={17} /></button><button type="button" onClick={() => void ask("suggest_evidence", copy.suggestEvidence)}><Paperclip size={18} />{copy.suggestEvidence}<ChevronRight size={17} /></button></section>}
+          {askMessages.length > 0 && <section className={styles.askConversation}>{askMessages.map((message, index) => message.role === "user" ? <div className={styles.askUserMessage} key={`${message.role}-${index}`}>{message.text}</div> : <div className={styles.askAssistantMessage} key={`${message.role}-${index}`}><p>{message.text}</p></div>)}{askLoading && <div className={styles.askLoading}>{copy.thinking}</div>}<div className={styles.askFollowups}><button type="button" disabled={askLoading} onClick={() => void ask("explain_options", copy.explainOptions)}><List size={16} />{copy.explainOptions}<ChevronRight size={16} /></button><button type="button" disabled={askLoading} onClick={() => void ask("give_example", copy.giveAnotherExample)}><FileText size={16} />{copy.giveAnotherExample}<ChevronRight size={16} /></button></div></section>}
+          {askError && <p className={styles.askAiError} role="alert">{askError}</p>}
+        </div>
+        <form className={styles.askAiComposer} onSubmit={(event) => { event.preventDefault(); void ask("custom"); }}><input value={askInput} onChange={(event) => setAskInput(event.target.value)} placeholder={copy.askPlaceholder} disabled={askLoading} /><button type="submit" aria-label={copy.sendQuestion} disabled={askLoading || !askInput.trim()}><Send size={21} /></button></form>
+        <p className={styles.askAiFooter}>{copy.askFooter}</p>
+      </aside>}
+
       {modalOpen && <div className={styles.overlay} role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target && !busy) setModalOpen(false); }}>
         <section className={styles.modal} role="dialog" aria-modal="true" aria-labelledby={`evidence-title-${questionId}`}>
           <header><h2 id={`evidence-title-${questionId}`}>{fr ? "Ajouter une preuve" : "Add evidence"}</h2><button type="button" aria-label={fr ? "Fermer" : "Close"} disabled={busy} onClick={() => setModalOpen(false)}><X size={20} /></button></header>
@@ -327,14 +411,14 @@ export function QuestionEvidence({ workspaceId, themeId, controlId, questionId, 
 
           {mode === "upload" ? <>
             <button type="button" className={styles.dropzone} onClick={() => fileInput.current?.click()}>
-              <Upload size={24} /><strong>{fr ? "Choisir un fichier" : "Choose a file"}</strong><span>PDF, PNG, JPEG, TXT, CSV · Max 10 MB</span>
+              <Upload size={24} /><strong>{fr ? "Choisir un fichier" : "Choose a file"}</strong><span>PDF, PNG, JPEG, TXT, CSV · {copy.max} 10 MB</span>
             </button>
             <input ref={fileInput} className={styles.hiddenInput} type="file" accept={ACCEPTED_FILES} onChange={(event) => { setSelectedFile(event.target.files?.[0] ?? null); setError(""); }} />
             {selectedFile && <div className={styles.selectedFile}><FileIcon item={{ mimeType: selectedFile.type, originalFilename: selectedFile.name }} size={24} /><span><strong>{selectedFile.name}</strong><small>{fileKind({ mimeType: selectedFile.type, originalFilename: selectedFile.name })} · {formatSize(selectedFile.size)}</small></span><button type="button" disabled={busy} aria-label={fr ? "Retirer le fichier" : "Remove file"} onClick={() => { setSelectedFile(null); if (fileInput.current) fileInput.current.value = ""; }}><X size={18} /></button></div>}
             <section className={styles.documentInformation} aria-labelledby={`document-information-${questionId}`}>
               <header><h3 id={`document-information-${questionId}`}><FileText size={18} />{fr ? "Informations du document" : "Document information"}</h3><span>{fr ? "Facultatif" : "Optional"}</span></header>
               <div className={styles.metadataGrid}>
-                <label className={styles.documentTypeField}>{fr ? "Type de document" : "Document type"}<select value={documentType} onChange={(event) => setDocumentType(event.target.value as DocumentType | "")}><option value="">{fr ? "Non renseigné" : "Not specified"}</option>{DOCUMENT_TYPE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
+                <label className={styles.documentTypeField}>{fr ? "Type de document" : "Document type"}<select value={documentType} onChange={(event) => setDocumentType(event.target.value as DocumentType | "")}><option value="">{fr ? "Non renseigné" : "Not specified"}</option>{DOCUMENT_TYPE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option[locale]}</option>)}</select></label>
                 <label>Version<input maxLength={100} value={documentVersion} onChange={(event) => setDocumentVersion(event.target.value)} placeholder={fr ? "Non renseignée" : "Not specified"} /></label>
                 <label>{fr ? "Date d’effet" : "Effective date"}<input type="date" value={effectiveDate} onChange={(event) => setEffectiveDate(event.target.value)} /></label>
                 <label>{fr ? "Date de revue" : "Review date"}<input type="date" min={effectiveDate || undefined} value={reviewDate} onChange={(event) => setReviewDate(event.target.value)} /></label>
@@ -348,7 +432,7 @@ export function QuestionEvidence({ workspaceId, themeId, controlId, questionId, 
                 const linkCount = allLinks.filter((link) => link.evidenceId === item.id).length;
                 const alreadyLinked = linkedEvidenceIds.has(item.id);
                 return <button type="button" key={item.id} disabled={alreadyLinked} className={selectedEvidenceId === item.id ? styles.selectedEvidence : ""} onClick={() => setSelectedEvidenceId(item.id)}>
-                  <i aria-hidden="true" /><FileIcon item={item} size={22} /><span><strong>{item.originalFilename}</strong><small>{fileKind(item)} · {formatSize(item.sizeBytes)}{linkCount > 0 ? ` · ${fr ? "Liée à" : "Linked to"} ${linkCount} question${linkCount > 1 ? "s" : ""}` : ""}</small></span>{alreadyLinked && <em>{fr ? "Déjà liée" : "Linked"}</em>}
+                  <i aria-hidden="true" /><FileIcon item={item} size={22} /><span><strong>{item.originalFilename}</strong><small>{fileKind(item)} · {formatSize(item.sizeBytes)}{linkCount > 0 ? ` · ${copy.linkedTo} ${linkCount} ${copy.questions}${linkCount > 1 ? "s" : ""}` : ""}</small></span>{alreadyLinked && <em>{fr ? "Déjà liée" : "Linked"}</em>}
                 </button>;
               }) : <p>{fr ? "Aucune preuve disponible." : "No evidence available."}</p>}
             </div>

@@ -96,7 +96,7 @@ export function buildPdfDocumentDefinition(
       if (currentPage === 1) return null;
       return {
         columns: [
-          { text: `Version: ${(meta.version || "V2").toUpperCase()}`, alignment: "left", color: "#64748b", fontSize: 9 },
+          { text: `Version: ${(meta.version || "Not specified").toUpperCase()}`, alignment: "left", color: "#64748b", fontSize: 9 },
           { text: `Page ${currentPage} of ${pageCount}`, alignment: "right", color: "#64748b", fontSize: 9 }
         ],
         margin: [40, 10, 40, 0]
@@ -142,10 +142,10 @@ export function buildPdfDocumentDefinition(
 
         const metaItems = [
           { label: "[TYPE]", value: (document.documentType || "").toUpperCase().includes("PROCEDURE") ? "PROCEDURE" : "POLICY" },
-          { label: "[VERSION]", value: (meta.version || "V2").toUpperCase() },
-          { label: "[STATUS]", value: (meta.status || "DRAFT").toUpperCase() },
-          { label: "[DATE]", value: meta.date || "2026-08-22" },
-          { label: "[CLASSIFICATION]", value: (meta.classification || "INTERNAL").toUpperCase() }
+          { label: "[VERSION]", value: (meta.version || "Not specified").toUpperCase() },
+          { label: "[STATUS]", value: (meta.status || "Not specified").toUpperCase() },
+          { label: "[DATE]", value: meta.date || "Not specified" },
+          { label: "[CLASSIFICATION]", value: (meta.classification || "Not specified").toUpperCase() }
         ];
         
         const metaStack = metaItems.map(item => ({
@@ -184,7 +184,7 @@ export function buildPdfDocumentDefinition(
           },
           // 1. ORGANIZATION NAME
           {
-            text: (meta.organization || "BIGSOLUTIONAI").toUpperCase().replace(/\s+/g, "\n"),
+            text: (meta.organization || "Organization").toUpperCase().replace(/\s+/g, "\n"),
             absolutePosition: { x: 45, y: 70 },
             fontSize: 22,
             bold: true,
@@ -241,7 +241,7 @@ export function buildPdfDocumentDefinition(
           },
           // 6. FOOTER
           {
-            text: "© " + new Date().getFullYear() + " " + (meta.organization || "BigSolutionAI") + ". All Rights Reserved.",
+            text: "© " + new Date().getFullYear() + " " + (meta.organization || "NormCore") + ". All Rights Reserved.",
             absolutePosition: { x: 40, y: h - 25 },
             fontSize: 9,
             color: "#94a3b8"
@@ -357,32 +357,42 @@ export async function generateDocumentPdf(document: StructuredDocument, meta: { 
   }
 
   const pdfMake = window.pdfMake;
+  if (!pdfMake?.createPdf) {
+    throw new Error("PDF library is unavailable.");
+  }
   const docDefinition = buildPdfDocumentDefinition(document, meta, logoSymbolUrl, logoTextUrl);
   const filename = `${document.title.replace(/\s+/g, "_")}.pdf`;
-  pdfMake.createPdf(docDefinition).download(filename);
+  const pdf = pdfMake.createPdf(docDefinition);
+  if (typeof pdf.download !== "function") {
+    throw new Error("PDF download is unavailable.");
+  }
+
+  // Await pdfmake's own blob/download Promise so generation failures are
+  // handled by the export handler instead of becoming unhandled rejections.
+  await pdf.download(filename);
 }
 
 function renderBlock(block: StructuredDocumentBlock): any {
   switch (block.type) {
     case "heading":
       return {
-        text: block.content || "",
+        text: pdfText(block.content),
         style: block.level === 3 ? "headingLevel3" : "headingLevel4",
         unbreakable: true
       };
     case "paragraph":
       return {
-        text: block.content || "",
+        text: pdfText(block.content),
         style: "paragraph",
       };
     case "bullet_list":
       return {
-        ul: block.items || [],
+        ul: (block.items || []).map(pdfText),
         style: "list",
       };
     case "numbered_list":
       return {
-        ol: block.items || [],
+        ol: (block.items || []).map(pdfText),
         style: "list",
       };
     case "table":
@@ -392,34 +402,43 @@ function renderBlock(block: StructuredDocumentBlock): any {
   }
 }
 
+function pdfText(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (value === null || value === undefined) return "";
+  if (typeof value === "number" || typeof value === "boolean" || typeof value === "bigint") return String(value);
+  return "";
+}
+
 function renderTable(headers: string[], rows: string[][]): any {
   const tableBody: any[][] = [];
+  const safeHeaders = (headers || []).map(pdfText);
+  const safeRows = (rows || []).map((row) => (row || []).map(pdfText));
 
-  if (headers && headers.length > 0) {
+  if (safeHeaders.length > 0) {
     tableBody.push(
-      headers.map((h) => ({
+      safeHeaders.map((h) => ({
         text: h,
         style: "tableHeader",
       }))
     );
   }
 
-  const isApproval = headers.some(h => h.toLowerCase().includes("signature") || h.toLowerCase().includes("approv"));
-  const isDocControl = headers.some(h => h.toLowerCase().includes("version") && h.toLowerCase().includes("date"));
+  const isApproval = safeHeaders.some(h => h.toLowerCase().includes("signature") || h.toLowerCase().includes("approv"));
+  const isDocControl = safeHeaders.some(h => h.toLowerCase().includes("version") && h.toLowerCase().includes("date"));
   
   let layoutWidths: any[] = [];
-  if (headers.length === 4) {
+  if (safeHeaders.length === 4) {
     if (isDocControl) layoutWidths = [50, 70, '*', 120];
     else if (isApproval) layoutWidths = ['*', 120, 80, 150]; 
     else layoutWidths = Array(4).fill('*');
-  } else if (headers.length === 3) {
+  } else if (safeHeaders.length === 3) {
      layoutWidths = ['auto', 'auto', '*'];
   } else {
-     layoutWidths = Array(Math.max(headers.length, ...(rows.map((r: any) => r.length) || [1]))).fill('*');
+     layoutWidths = Array(Math.max(safeHeaders.length, ...(safeRows.map((r) => r.length) || [1]))).fill('*');
   }
 
-  if (rows && rows.length > 0) {
-    rows.forEach((row) => {
+  if (safeRows.length > 0) {
+    safeRows.forEach((row) => {
       tableBody.push(
         row.map((cell) => ({
           text: cell,
@@ -435,7 +454,7 @@ function renderTable(headers: string[], rows: string[][]): any {
   return {
     style: "tableExample",
     table: {
-      headerRows: headers.length > 0 ? 1 : 0,
+      headerRows: safeHeaders.length > 0 ? 1 : 0,
       widths: layoutWidths,
       body: tableBody,
       dontBreakRows: true, // prevents breaking rows across pages

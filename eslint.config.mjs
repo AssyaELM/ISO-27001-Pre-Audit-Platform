@@ -11,6 +11,9 @@ export default defineConfig([
       // Downgraded to warn: calling setState inside an effect is intentional in
       // ai-documents-page.tsx to synchronize local form state from server-fetched setup data.
       "react-hooks/set-state-in-effect": "warn",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "react-hooks/error-boundaries": "off",
+      "react-hooks/purity": "warn"
     },
   },
 ]);

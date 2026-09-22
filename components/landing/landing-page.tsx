@@ -14,31 +14,34 @@ import {
 } from "./sections";
 import { Footer } from "./footer";
 import { LanguageProvider } from "./language-context";
+import { LandingSkipLink } from "./landing-skip-link";
+
+function LandingContent() {
+  return <div className="site-shell">
+    <LandingSkipLink />
+    <Header />
+    <main id="main-content">
+      <ScrollWorldExperience>
+        <HeroSection />
+        <ProblemSection />
+        <HowItWorksSection />
+        <DomainsSection />
+        <AnnexASection />
+        <FeaturesSection />
+        <AIAssistantSection />
+        <AudienceSection />
+        <FAQSection />
+        <FinalCTASection />
+      </ScrollWorldExperience>
+    </main>
+    <Footer />
+  </div>;
+}
 
 export function LandingPage() {
   return (
     <LanguageProvider>
-      <div className="site-shell">
-        <a className="skip-link" href="#main-content">
-          Skip to content
-        </a>
-        <Header />
-        <main id="main-content">
-          <ScrollWorldExperience>
-            <HeroSection />
-            <ProblemSection />
-            <HowItWorksSection />
-            <DomainsSection />
-            <AnnexASection />
-            <FeaturesSection />
-            <AIAssistantSection />
-            <AudienceSection />
-            <FAQSection />
-            <FinalCTASection />
-          </ScrollWorldExperience>
-        </main>
-        <Footer />
-      </div>
+      <LandingContent />
     </LanguageProvider>
   );
 }

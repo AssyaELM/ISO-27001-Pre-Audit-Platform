@@ -35,12 +35,15 @@ import type { StructuredDocument, StructuredDocumentBlock } from "@/lib/ai/docum
 import type { AiDocumentUiEntry, AiDocumentUiStatus } from "@/lib/ai-documents/ui";
 import { CANONICAL_AI_DOCUMENT_TYPES, safeGenerationError } from "@/lib/ai-documents/ui";
 import { AppSidebar } from "@/components/navigation/app-sidebar";
+import { LanguageToggle } from "@/components/language-toggle";
+import { useStoredLanguage } from "@/components/language-preference";
 import { fetchAssessmentData } from "@/lib/assessment/client-cache";
 import styles from "./ai-documents-page.module.css";
 
 type Props = { documentType?: string };
 type UserContext = { workspaceId: string; organization: string; name: string };
 type StatusFilter = "all" | AiDocumentUiStatus;
+type Locale = "en" | "fr";
 type PreflightField = { resolved: boolean; value: unknown; source: string | null; confidence: string | null };
 type PreflightResult = {
   authenticatedUser: { resolved: boolean };
@@ -54,12 +57,12 @@ type PreflightResult = {
   predictedDocumentVersion: string | null;
 };
 
-const statusLabel: Record<AiDocumentUiStatus, string> = {
-  missing: "Missing",
-  ready: "Ready",
-  draft: "Draft",
-  finalized: "Finalized",
-  already_available: "Already available",
+const statusLabels: Record<AiDocumentUiStatus, Record<Locale, string>> = {
+  missing: { en: "Missing", fr: "Manquant" },
+  ready: { en: "Ready", fr: "Prêt" },
+  draft: { en: "Draft", fr: "Brouillon" },
+  finalized: { en: "Finalized", fr: "Finalisé" },
+  already_available: { en: "Already available", fr: "Déjà disponible" },
 };
 
 const statusTone: Record<AiDocumentUiStatus, string> = {
@@ -80,11 +83,11 @@ function text(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function formatDate(value: string | null, locale = "en-US") {
+function formatDate(value: string | null, locale: Locale | string = "en") {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.valueOf())) return "—";
-  return new Intl.DateTimeFormat(locale, { month: "short", day: "numeric", year: "numeric" }).format(date);
+  return new Intl.DateTimeFormat(locale === "fr" ? "fr-FR" : "en-US", { month: "short", day: "numeric", year: "numeric" }).format(date);
 }
 
 async function getAuthenticatedUserId(): Promise<string> {
@@ -108,14 +111,97 @@ async function authenticatedApiHeaders(): Promise<HeadersInit> {
   return { Authorization: `Bearer ${data.session.access_token}` };
 }
 
-function typeLabel(type: string) {
-  return type.includes("procedure") ? "Procedure" : "Policy";
+const documentCopy: Record<string, Record<Locale, { label: string; description: string }>> = {
+  information_security_policy: {
+    en: { label: "Information Security Policy", description: "Policy" },
+    fr: { label: "Politique de sécurité de l'information", description: "Politique" },
+  },
+  access_control_policy: {
+    en: { label: "Access Control Policy", description: "Policy" },
+    fr: { label: "Politique de contrôle d'accès", description: "Politique" },
+  },
+  incident_management_procedure: {
+    en: { label: "Incident Management Procedure", description: "Procedure" },
+    fr: { label: "Procédure de gestion des incidents", description: "Procédure" },
+  },
+  backup_and_recovery_policy: {
+    en: { label: "Backup and Recovery Policy", description: "Policy" },
+    fr: { label: "Politique de sauvegarde et de restauration", description: "Politique" },
+  },
+  information_asset_management_policy: {
+    en: { label: "Information Asset Management Policy", description: "Policy" },
+    fr: { label: "Politique de gestion des actifs informationnels", description: "Politique" },
+  },
+};
+
+function statusLabel(status: AiDocumentUiStatus, locale: Locale) {
+  return statusLabels[status][locale];
+}
+
+function documentLabel(document: AiDocumentUiEntry, locale: Locale) {
+  return documentCopy[document.documentType]?.[locale].label ?? document.label;
+}
+
+function typeLabel(type: string, locale: Locale) {
+  return documentCopy[type]?.[locale].description ?? (type.includes("procedure") ? (locale === "fr" ? "Procédure" : "Procedure") : (locale === "fr" ? "Politique" : "Policy"));
+}
+
+function inputLabel(value: string, locale: Locale) {
+  if (locale === "en") return value;
+  const map: Record<string, string> = {
+    Organization: "Organisation",
+    "Policy owner": "Responsable de la politique",
+    Approver: "Approbateur",
+    Classification: "Classification",
+    "Review plan": "Plan de revue",
+    Scope: "Périmètre",
+    Country: "Pays",
+    Sector: "Secteur",
+    "Company size": "Taille de l'entreprise",
+    "Communication channel": "Canal de communication",
+    "Document ID": "Identifiant du document",
+    "Document owner": "Propriétaire du document",
+    Version: "Version",
+    "Document classification": "Classification du document",
+    "Document status": "Statut du document",
+    "Effective date": "Date d'entrée en vigueur",
+    "Review date": "Date de revue",
+    "Prepared by": "Préparé par",
+    "Reviewed by": "Relu par",
+    "Approval date": "Date d'approbation",
+  };
+  return map[value] ?? value;
+}
+
+function localizeAiError(message: string, locale: Locale) {
+  if (locale === "en") return message;
+  const map: Record<string, string> = {
+    "A valid workspace member is required before finalization.": "Un membre valide de l'espace est requis avant la finalisation.",
+    "Unable to load AI Documents.": "Impossible de charger les documents IA.",
+    "Unable to run ISP preflight.": "Impossible d'exécuter la vérification préalable ISP.",
+    "Failed to save inputs": "Impossible d'enregistrer les informations.",
+    "Could not save setup inputs.": "Impossible d'enregistrer les informations de préparation.",
+    "Failed to save changes": "Impossible d'enregistrer les modifications.",
+    "Could not save changes": "Impossible d'enregistrer les modifications.",
+    "Failed to export PDF": "Impossible d'exporter le PDF.",
+    "Failed to finalize document": "Impossible de finaliser le document.",
+    "Could not finalize document": "Impossible de finaliser le document.",
+    "Draft generation couldn't be completed. Your document inputs are safe.": "La génération du brouillon n'a pas pu être terminée. Vos informations de document sont conservées.",
+    "Generation took too long. No draft was saved.": "La génération a pris trop de temps. Aucun brouillon n'a été enregistré.",
+    "AI provider rate limit reached. Please wait and retry. No draft was saved.": "La limite du fournisseur IA est atteinte. Patientez puis réessayez. Aucun brouillon n'a été enregistré.",
+    "The generated content did not pass validation. No draft was saved.": "Le contenu généré n'a pas passé la validation. Aucun brouillon n'a été enregistré.",
+    "The generated draft contained information that could not be verified. No document was saved.": "Le brouillon généré contenait des informations non vérifiables. Aucun document n'a été enregistré.",
+    "The draft was generated but could not be saved to the registry.": "Le brouillon a été généré, mais n'a pas pu être enregistré dans le registre.",
+  };
+  return map[message] ?? message;
 }
 
 
 
 function Shell({ user, children }: { user: UserContext; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const { language } = useStoredLanguage();
+  const french = language === "fr";
 
   return (
     <main className={styles.shell}>
@@ -123,12 +209,12 @@ function Shell({ user, children }: { user: UserContext; children: React.ReactNod
 
       <section className={styles.main}>
         <header className={styles.topbar}>
-          <button type="button" className={styles.menu} onClick={() => setOpen((value) => !value)} aria-label="Toggle navigation"><Menu /></button>
-          <div className={styles.crumb}><span>{user.organization}</span><b>/</b><strong>AI Documents</strong></div>
+          <button type="button" className={styles.menu} onClick={() => setOpen((value) => !value)} aria-label={french ? "Basculer la navigation" : "Toggle navigation"}><Menu /></button>
+          <div className={styles.crumb}><span>{user.organization}</span><b>/</b><strong>{french ? "Documents IA" : "AI Documents"}</strong></div>
           <div className={styles.profile}>
-            <span className={styles.locale}>EN / FR</span>
-            <span className={styles.activeWorkspace}><i />Workspace active</span>
-            <strong>{user.name || "Workspace owner"}</strong>
+            <LanguageToggle className={styles.locale} />
+            <span className={styles.activeWorkspace}><i />{french ? "Espace actif" : "Workspace active"}</span>
+            <strong>{user.name || (french ? "Responsable de l’espace" : "Workspace owner")}</strong>
             <span className={styles.avatar}>{(user.name || "W")[0].toUpperCase()}</span>
           </div>
         </header>
@@ -151,28 +237,28 @@ const preflightLabels: Record<string, string> = {
   communication_channel: "Communication channel",
 };
 
-function PreflightPanel({ result, loading, error, onRun }: { result: PreflightResult | null; loading: boolean; error: string; onRun: () => void }) {
+function PreflightPanel({ result, loading, error, onRun, locale }: { result: PreflightResult | null; loading: boolean; error: string; onRun: () => void; locale: Locale }) {
   const fieldEntries = result ? Object.entries(result.fields) : [];
   const go = Boolean(result && result.authenticatedUser.resolved && result.currentWorkspace.resolved && result.missingInputs.length === 0 && result.blockedSections.length === 0);
   return (
     <section className={styles.preflightPanel} aria-label="ISP preflight">
       <div className={styles.preflightHeader}>
-        <div><strong>ISP preflight</strong><span>Read-only check using the current authenticated workspace session.</span></div>
-        <button type="button" className={styles.ghostButton} onClick={onRun} disabled={loading || !result && false}>{loading ? "Checking…" : "Run ISP preflight"}</button>
+        <div><strong>{locale === "fr" ? "Vérification préalable ISP" : "ISP preflight"}</strong><span>{locale === "fr" ? "Contrôle en lecture seule avec la session authentifiée de l'espace actuel." : "Read-only check using the current authenticated workspace session."}</span></div>
+        <button type="button" className={styles.ghostButton} onClick={onRun} disabled={loading || !result && false}>{loading ? (locale === "fr" ? "Vérification…" : "Checking…") : (locale === "fr" ? "Lancer la vérification ISP" : "Run ISP preflight")}</button>
       </div>
       {error && <p className={styles.errorBanner}>{error}</p>}
       {result && <>
         <div className={styles.preflightGrid}>
-          <span>Authenticated user<strong>{result.authenticatedUser.resolved ? "PASS" : "FAIL"}</strong></span>
-          <span>Current workspace<strong>{result.currentWorkspace.resolved ? "PASS" : "FAIL"}</strong></span>
-          {fieldEntries.map(([key, field]) => <span key={key}>{preflightLabels[key] ?? key}<strong>{field.resolved ? "YES" : "NO"}</strong></span>)}
-          <span>Roles resolved<strong>{result.realSecurityRoles.resolved ? "YES" : "NO"}</strong></span>
-          <span>Registry resolved<strong>{result.registryDocuments.length > 0 ? "YES" : "NO"}</strong></span>
+          <span>{locale === "fr" ? "Utilisateur authentifié" : "Authenticated user"}<strong>{result.authenticatedUser.resolved ? "PASS" : "FAIL"}</strong></span>
+          <span>{locale === "fr" ? "Espace actuel" : "Current workspace"}<strong>{result.currentWorkspace.resolved ? "PASS" : "FAIL"}</strong></span>
+          {fieldEntries.map(([key, field]) => <span key={key}>{inputLabel(preflightLabels[key] ?? key, locale)}<strong>{field.resolved ? (locale === "fr" ? "OUI" : "YES") : "NO"}</strong></span>)}
+          <span>{locale === "fr" ? "Rôles résolus" : "Roles resolved"}<strong>{result.realSecurityRoles.resolved ? (locale === "fr" ? "OUI" : "YES") : "NO"}</strong></span>
+          <span>{locale === "fr" ? "Registre résolu" : "Registry resolved"}<strong>{result.registryDocuments.length > 0 ? (locale === "fr" ? "OUI" : "YES") : "NO"}</strong></span>
         </div>
         <div className={styles.preflightDetails}>
-          <span>Missing inputs: <strong>{result.missingInputs.length ? result.missingInputs.map((item) => typeof item === "object" && item !== null ? String((item as Record<string, unknown>).key ?? "unknown") : String(item)).join(", ") : "none"}</strong></span>
-          <span>Blocked sections: <strong>{result.blockedSections.length ? result.blockedSections.join(", ") : "none"}</strong></span>
-          <span>Predicted version: <strong>{result.predictedDocumentVersion ?? "—"}</strong></span>
+          <span>{locale === "fr" ? "Informations manquantes" : "Missing inputs"}: <strong>{result.missingInputs.length ? result.missingInputs.map((item) => typeof item === "object" && item !== null ? String((item as Record<string, unknown>).key ?? "unknown") : String(item)).join(", ") : (locale === "fr" ? "aucune" : "none")}</strong></span>
+          <span>{locale === "fr" ? "Sections bloquées" : "Blocked sections"}: <strong>{result.blockedSections.length ? result.blockedSections.join(", ") : (locale === "fr" ? "aucune" : "none")}</strong></span>
+          <span>{locale === "fr" ? "Version prévue" : "Predicted version"}: <strong>{result.predictedDocumentVersion ?? "—"}</strong></span>
           <b className={go ? styles.preflightGo : styles.preflightNoGo}>{go ? "GO" : "NO-GO"}</b>
         </div>
       </>}
@@ -185,6 +271,8 @@ let globalWorkspaceId: string | null = null;
 
 export function AiDocumentsPage({ documentType, initialWorkspaceId, initialDocuments }: Props & { initialWorkspaceId?: string; initialDocuments?: AiDocumentUiEntry[] }) {
   const router = useRouter();
+  const { language } = useStoredLanguage();
+  const locale: Locale = language === "fr" ? "fr" : "en";
   const [loading, setLoading] = useState(!globalDocumentsCache && (!initialDocuments || initialDocuments.length === 0));
   const [error, setError] = useState("");
   const [documents, setDocuments] = useState<AiDocumentUiEntry[]>(globalDocumentsCache || initialDocuments || []);
@@ -216,7 +304,7 @@ export function AiDocumentsPage({ documentType, initialWorkspaceId, initialDocum
       setDocuments(body.documents ?? []);
       globalDocumentsCache = body.documents ?? [];
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Unable to load AI Documents.");
+      setError(localizeAiError(cause instanceof Error ? cause.message : "Unable to load AI Documents.", locale));
     } finally {
       setLoading(false);
     }
@@ -312,7 +400,7 @@ export function AiDocumentsPage({ documentType, initialWorkspaceId, initialDocum
       if (!response.ok) throw new Error(body.error || "Unable to run ISP preflight.");
       setPreflight(body);
     } catch (cause) {
-      setPreflightError(cause instanceof Error ? cause.message : "Unable to run ISP preflight.");
+      setPreflightError(localizeAiError(cause instanceof Error ? cause.message : "Unable to run ISP preflight.", locale));
     } finally {
       setPreflightLoading(false);
     }
@@ -341,9 +429,9 @@ export function AiDocumentsPage({ documentType, initialWorkspaceId, initialDocum
       const error = cause instanceof Error ? cause as Error & { code?: string; retryAfterSeconds?: unknown } : null;
       const retryAfterSeconds = Number(error?.retryAfterSeconds);
       if (error?.code === "AI_PROVIDER_RATE_LIMITED" && Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0) {
-        setGenerateError(`Groq rate limit reached. Retrying the current document section group in ${Math.ceil(retryAfterSeconds)} seconds...`);
+        setGenerateError(locale === "fr" ? `Limite Groq atteinte. Nouvelle tentative du groupe de sections dans ${Math.ceil(retryAfterSeconds)} secondes...` : `Groq rate limit reached. Retrying the current document section group in ${Math.ceil(retryAfterSeconds)} seconds...`);
       } else {
-        setGenerateError(error?.message || safeGenerationError());
+        setGenerateError(localizeAiError(error?.message || safeGenerationError(), locale));
       }
       setSelectedDetail(documentEntry.documentType);
     } finally {
@@ -371,7 +459,7 @@ export function AiDocumentsPage({ documentType, initialWorkspaceId, initialDocum
       void refresh();
     } catch (e) {
       console.error(e);
-      alert("Could not save setup inputs.");
+      alert(localizeAiError("Could not save setup inputs.", locale));
     } finally {
       setSavingSetup(false);
     }
@@ -382,16 +470,16 @@ export function AiDocumentsPage({ documentType, initialWorkspaceId, initialDocum
   return (
     <Shell user={user}>
       <div className={styles.page}>
-        {user.workspaceId && <PreflightPanel result={preflight} loading={preflightLoading} error={preflightError} onRun={() => void runIspPreflight()} />}
         {loading ? (
-          <div className={styles.centerState}><LoaderCircle className={styles.spin} /><h1>Loading AI Documents</h1><p>Reading the workspace Registry and generation contracts.</p></div>
+          <div className={styles.centerState}><LoaderCircle className={styles.spin} /><h1>{locale === "fr" ? "Chargement des documents IA" : "Loading AI Documents"}</h1><p>{locale === "fr" ? "Lecture du registre de l'espace et des contrats de génération." : "Reading the workspace Registry and generation contracts."}</p></div>
         ) : !user.workspaceId ? (
-          <div className={styles.centerState}><TriangleAlert /><h1>Workspace setup required</h1><p>Complete workspace onboarding before using AI Documents.</p><Link prefetch={true} className={styles.primary} href="/onboarding">Open workspace setup</Link></div>
+          <div className={styles.centerState}><TriangleAlert /><h1>{locale === "fr" ? "Configuration de l'espace requise" : "Workspace setup required"}</h1><p>{locale === "fr" ? "Terminez l'onboarding de l'espace avant d'utiliser les documents IA." : "Complete workspace onboarding before using AI Documents."}</p><Link prefetch={true} className={styles.primary} href="/onboarding">{locale === "fr" ? "Ouvrir la configuration" : "Open workspace setup"}</Link></div>
         ) : generatingType && generationEntry ? (
-          <GenerationState title={generationEntry.label} onBack={() => setGeneratingType(null)} />
+          <GenerationState title={documentLabel(generationEntry, locale)} onBack={() => setGeneratingType(null)} locale={locale} />
         ) : selected ? (
           <DocumentDetail
             document={selected}
+            locale={locale}
             setup={setup}
             setSetup={setSetup}
             error={generateError}
@@ -404,6 +492,10 @@ export function AiDocumentsPage({ documentType, initialWorkspaceId, initialDocum
             workspaceId={user.workspaceId}
             organization={user.organization}
             onRefresh={() => void refresh()}
+            onRunPreflight={runIspPreflight}
+            preflight={preflight}
+            preflightLoading={preflightLoading}
+            preflightError={preflightError}
             forceShowPrep={showNewVersionPrep}
           />
         ) : (
@@ -420,6 +512,7 @@ export function AiDocumentsPage({ documentType, initialWorkspaceId, initialDocum
             }}
             isPending={isPending}
             onRefresh={() => void refresh()}
+            locale={locale}
           />
         )}
       </div>
@@ -437,6 +530,7 @@ function Overview({
   onGenerateNewVersion,
   isPending,
   onRefresh,
+  locale,
 }: {
   documents: AiDocumentUiEntry[];
   counts: { total: number; missing: number; ready: number; draft: number; already_available: number; finalized: number };
@@ -447,36 +541,37 @@ function Overview({
   onGenerateNewVersion: (value: string) => void;
   isPending: boolean;
   onRefresh: () => void;
+  locale: Locale;
 }) {
   const covered = counts.already_available + counts.finalized;
   return (
     <>
       <header className={styles.pageHeader}>
         <div>
-          <h1>AI Documents</h1>
-          <p>Priority documents covered by the Registry and evidence sources.</p>
+          <h1>{locale === "fr" ? "Documents IA" : "AI Documents"}</h1>
+          <p>{locale === "fr" ? "Documents prioritaires couverts par le registre et les sources de preuves." : "Priority documents covered by the Registry and evidence sources."}</p>
         </div>
-        <button type="button" className={styles.ghostButton} onClick={onRefresh} disabled={isPending}><RefreshCw />Refresh</button>
+        <button type="button" className={styles.ghostButton} onClick={onRefresh} disabled={isPending}><RefreshCw />{locale === "fr" ? "Actualiser" : "Refresh"}</button>
       </header>
 
       {error && <div className={styles.errorBanner} role="alert"><AlertCircle />{error}</div>}
-      {!counts.missing && <div className={styles.covered}><CopyCheck />Priority documents covered</div>}
+      {!counts.missing && <div className={styles.covered}><CopyCheck />{locale === "fr" ? "Documents prioritaires couverts" : "Priority documents covered"}</div>}
 
       <section className={styles.stats}>
-        <StatCard icon={<FileText />} label="Priority documents" value={counts.total} />
-        <StatCard icon={<AlertCircle />} label="Missing" value={counts.missing} tone="missing" />
-        <StatCard icon={<FilePenLine />} label="Draft" value={counts.draft} tone="draft" />
-        <StatCard icon={<FileCheck2 />} label="Available / Finalized" value={covered} tone="finalized" />
+        <StatCard icon={<FileText />} label={locale === "fr" ? "Documents prioritaires" : "Priority documents"} value={counts.total} />
+        <StatCard icon={<AlertCircle />} label={statusLabel("missing", locale)} value={counts.missing} tone="missing" />
+        <StatCard icon={<FilePenLine />} label={statusLabel("draft", locale)} value={counts.draft} tone="draft" />
+        <StatCard icon={<FileCheck2 />} label={locale === "fr" ? "Disponibles / finalisés" : "Available / Finalized"} value={covered} tone="finalized" />
       </section>
 
-      <div className={styles.filters} role="tablist" aria-label="Document status filters">
+      <div className={styles.filters} role="tablist" aria-label={locale === "fr" ? "Filtres de statut des documents" : "Document status filters"}>
         {[
-          ["all", "All", documents.length],
-          ["missing", "Missing", counts.missing],
-          ["ready", "Ready", counts.ready],
-          ["draft", "Draft", counts.draft],
-          ["already_available", "Available", counts.already_available],
-          ["finalized", "Finalized", counts.finalized],
+          ["all", locale === "fr" ? "Tous" : "All", documents.length],
+          ["missing", statusLabel("missing", locale), counts.missing],
+          ["ready", statusLabel("ready", locale), counts.ready],
+          ["draft", statusLabel("draft", locale), counts.draft],
+          ["already_available", locale === "fr" ? "Disponibles" : "Available", counts.already_available],
+          ["finalized", statusLabel("finalized", locale), counts.finalized],
         ].map(([value, label, count]) => (
           <button
             key={String(value)}
@@ -494,6 +589,7 @@ function Overview({
           <DocumentCard
             key={document.documentType}
             document={document}
+            locale={locale}
             onOpen={() => onOpenDocument(document.documentType)}
             onGenerateNew={document.status === "draft" ? () => onGenerateNewVersion(document.documentType) : undefined}
           />
@@ -501,7 +597,7 @@ function Overview({
       </section>
 
       <div className={styles.footerNote}>
-        <span>{covered} documents available or finalized</span>
+        <span>{locale === "fr" ? `${covered} documents disponibles ou finalisés` : `${covered} documents available or finalized`}</span>
       </div>
     </>
   );
@@ -511,53 +607,53 @@ function StatCard({ icon, label, value, tone }: { icon: React.ReactNode; label: 
   return <article className={`${styles.statCard} ${tone ? styles[tone] : ""}`}>{icon}<span>{label}<strong>{value}</strong></span></article>;
 }
 
-function DocumentCard({ document, onOpen, onGenerateNew }: { document: AiDocumentUiEntry; onOpen: () => void; onGenerateNew?: () => void }) {
+function DocumentCard({ document, onOpen, onGenerateNew, locale }: { document: AiDocumentUiEntry; onOpen: () => void; onGenerateNew?: () => void; locale: Locale }) {
   const primaryAction = document.status === "already_available"
-    ? "View document"
+    ? (locale === "fr" ? "Voir le document" : "View document")
     : document.status === "finalized"
-      ? "Open document"
+      ? (locale === "fr" ? "Ouvrir le document" : "Open document")
       : document.status === "draft"
-        ? "Continue draft"
+        ? (locale === "fr" ? "Continuer le brouillon" : "Continue draft")
         : document.status === "ready"
-          ? "Prepare document"
-          : "Prepare document";
+          ? (locale === "fr" ? "Préparer le document" : "Prepare document")
+          : (locale === "fr" ? "Préparer le document" : "Prepare document");
 
   return (
     <article className={styles.documentCard}>
       <div className={`${styles.docIcon} ${styles[statusTone[document.status]]}`}>
         <FileText />
-        <small>{typeLabel(document.documentType)}</small>
+        <small>{typeLabel(document.documentType, locale)}</small>
       </div>
       <div className={styles.docBody}>
         <header>
           <div>
-            <h2>{document.label}</h2>
-            <p>{typeLabel(document.documentType)}</p>
+            <h2>{documentLabel(document, locale)}</h2>
+            <p>{typeLabel(document.documentType, locale)}</p>
           </div>
-          <span className={`${styles.badge} ${styles[statusTone[document.status]]}`}>{statusLabel[document.status]}</span>
+          <span className={`${styles.badge} ${styles[statusTone[document.status]]}`}>{statusLabel(document.status, locale)}</span>
         </header>
         <div className={styles.meta}>
-          {document.version ? <span>Version<strong>{document.version}</strong></span> : <><span>Inputs resolved<strong>{document.preparation.knownInputCount}</strong></span><span>Inputs required<strong>{document.preparation.missingInputs.length}</strong></span></>}
-          <span>{document.reviewDate ? "Review" : "Updated"}<strong>{formatDate(document.reviewDate || document.updatedAt)}</strong></span>
-          <span>Sources<strong>{document.preparation.sourceCount}</strong></span>
+          {document.version ? <span>Version<strong>{document.version}</strong></span> : <><span>{locale === "fr" ? "Entrées résolues" : "Inputs resolved"}<strong>{document.preparation.knownInputCount}</strong></span><span>{locale === "fr" ? "Entrées requises" : "Inputs required"}<strong>{document.preparation.missingInputs.length}</strong></span></>}
+          <span>{document.reviewDate ? (locale === "fr" ? "Revue" : "Review") : (locale === "fr" ? "Mis à jour" : "Updated")}<strong>{formatDate(document.reviewDate || document.updatedAt, locale)}</strong></span>
+          <span>{locale === "fr" ? "Sources" : "Sources"}<strong>{document.preparation.sourceCount}</strong></span>
         </div>
         <div className={styles.readiness}>
-          <span>Readiness</span>
+          <span>{locale === "fr" ? "Préparation" : "Readiness"}</span>
           <i><b style={{ width: `${document.readiness}%` }} /></i>
           <strong>{document.readiness}%</strong>
         </div>
         <div className={styles.cardActions}>
           {document.status === "draft" ? (
             <>
-              <button type="button" className={styles.primarySmall} onClick={onOpen}>Continue draft <ArrowRight /></button>
+              <button type="button" className={styles.primarySmall} onClick={onOpen}>{locale === "fr" ? "Continuer le brouillon" : "Continue draft"} <ArrowRight /></button>
               {onGenerateNew && (
                 <button
                   type="button"
                   className={styles.secondarySmall}
                   onClick={onGenerateNew}
-                  title="Generate a new version — the current draft will be preserved"
+                  title={locale === "fr" ? "Générer une nouvelle version — le brouillon actuel sera conservé" : "Generate a new version — the current draft will be preserved"}
                 >
-                  <RefreshCw size={13} /> New version
+                  <RefreshCw size={13} /> {locale === "fr" ? "Nouvelle version" : "New version"}
                 </button>
               )}
             </>
@@ -574,6 +670,7 @@ function DocumentCard({ document, onOpen, onGenerateNew }: { document: AiDocumen
 
 function DocumentDetail({
   document,
+  locale,
   setup,
   setSetup,
   error,
@@ -587,8 +684,13 @@ function DocumentDetail({
   organization,
   onRefresh,
   forceShowPrep,
+  onRunPreflight,
+  preflight,
+  preflightLoading,
+  preflightError,
 }: {
   document: AiDocumentUiEntry;
+  locale: Locale;
   setup: Record<string, string>;
   setSetup: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   error: string;
@@ -602,105 +704,110 @@ function DocumentDetail({
   organization: string;
   onRefresh: () => void;
   forceShowPrep?: boolean;
+  onRunPreflight: () => void;
+  preflight: PreflightResult | null;
+  preflightLoading: boolean;
+  preflightError: string;
 }) {
-  if ((document.status === "draft" || document.status === "finalized") && !forceShowPrep) return <Draft document={document} workspaceId={workspaceId} organization={organization} onBack={onBack} onRefresh={onRefresh} />;
-  if (document.status === "already_available") return <Available document={document} workspaceId={workspaceId} onBack={onBack} onOpenEvidence={onOpenEvidence} />;
-  if (error) return <ErrorState title={document.label} message={error} retry={generate} back={onBack} />;
+  if ((document.status === "draft" || document.status === "finalized") && !forceShowPrep) return <Draft document={document} workspaceId={workspaceId} organization={organization} onBack={onBack} onRefresh={onRefresh} locale={locale} />;
+  if (document.status === "already_available") return <Available document={document} workspaceId={workspaceId} onBack={onBack} onOpenEvidence={onOpenEvidence} locale={locale} />;
+  if (error) return <ErrorState title={documentLabel(document, locale)} message={error} retry={generate} back={onBack} locale={locale} />;
 
   const missing = document.preparation.missingInputs;
   const complete = missing.length > 0 && missing.every((item) => setup[item.key]?.trim());
 
   return (
     <>
-      <Link prefetch={true} className={styles.back} href="/ai-documents"><ArrowLeft />AI Documents</Link>
+      <Link prefetch={true} className={styles.back} href="/ai-documents" onClick={onBack}><ArrowLeft />{locale === "fr" ? "Documents IA" : "AI Documents"}</Link>
       {forceShowPrep && document.version && (
         <div className={styles.newVersionBanner} role="note">
           <RefreshCw size={15} />
           <span>
-            You are generating a <strong>new version</strong> — {document.version} will be preserved unchanged.
+            {locale === "fr" ? <>Vous générez une <strong>nouvelle version</strong> — {document.version} sera conservée sans modification.</> : <>You are generating a <strong>new version</strong> — {document.version} will be preserved unchanged.</>}
           </span>
-          <button type="button" className={styles.ghostButton} onClick={onBack}>← Back to current draft</button>
+          <button type="button" className={styles.ghostButton} onClick={onBack}>← {locale === "fr" ? "Retour au brouillon actuel" : "Back to current draft"}</button>
         </div>
       )}
       <header className={styles.detailHeader}>
         <div>
-          <h1>{document.label}</h1>
+          <h1>{documentLabel(document, locale)}</h1>
           <div className={styles.detailBadges}>
-            <span className={`${styles.badge} ${styles[statusTone[document.status]]}`}>{statusLabel[document.status]}</span>
-            <span className={styles.typeBadge}>{typeLabel(document.documentType)}</span>
+            <span className={`${styles.badge} ${styles[statusTone[document.status]]}`}>{statusLabel(document.status, locale)}</span>
+            <span className={styles.typeBadge}>{typeLabel(document.documentType, locale)}</span>
           </div>
         </div>
         <div className={styles.headerActions}>
-          <button type="button" className={styles.secondary} onClick={onBack}><ArrowLeft />Back to documents</button>
+          <button type="button" className={styles.secondary} onClick={onBack}><ArrowLeft />{locale === "fr" ? "Retour aux documents" : "Back to documents"}</button>
           <button type="button" className={styles.primary} disabled={missing.length > 0 && !complete} onClick={generate}>
-            <Upload />{forceShowPrep ? "Generate new version" : "Generate draft"}
+            <Upload />{forceShowPrep ? (locale === "fr" ? "Générer une nouvelle version" : "Generate new version") : (locale === "fr" ? "Générer le brouillon" : "Generate draft")}
           </button>
         </div>
       </header>
 
       <section className={styles.detailStats}>
-        <article><Gauge /><strong>{document.readiness}%</strong><span>Input readiness</span></article>
-        <article><FileCheck2 /><strong>{document.preparation.knownInputCount}</strong><span>Inputs resolved</span></article>
-        <article className={styles.red}><AlertCircle /><strong>{missing.length}</strong><span>Inputs required</span></article>
-        <article><FolderOpen /><strong>{document.preparation.sourceCount}</strong><span>Sources available</span></article>
+        <article><Gauge /><strong>{document.readiness}%</strong><span>{locale === "fr" ? "Préparation des entrées" : "Input readiness"}</span></article>
+        <article><FileCheck2 /><strong>{document.preparation.knownInputCount}</strong><span>{locale === "fr" ? "Entrées résolues" : "Inputs resolved"}</span></article>
+        <article className={styles.red}><AlertCircle /><strong>{missing.length}</strong><span>{locale === "fr" ? "Entrées requises" : "Inputs required"}</span></article>
+        <article><FolderOpen /><strong>{document.preparation.sourceCount}</strong><span>{locale === "fr" ? "Sources disponibles" : "Sources available"}</span></article>
       </section>
+      {document.documentType === "information_security_policy" && <PreflightPanel result={preflight} loading={preflightLoading} error={preflightError} onRun={onRunPreflight} locale={locale} />}
 
       {missing.length ? (
         <section className={styles.setupGrid}>
           <article className={styles.setupPanel}>
-            <h2>Complete missing information</h2>
-            <p className={styles.setupNote}>{missing.length} detail{missing.length > 1 ? "s" : ""} needed before generation</p>
+            <h2>{locale === "fr" ? "Compléter les informations manquantes" : "Complete missing information"}</h2>
+            <p className={styles.setupNote}>{locale === "fr" ? `${missing.length} détail${missing.length > 1 ? "s" : ""} requis avant génération` : `${missing.length} detail${missing.length > 1 ? "s" : ""} needed before generation`}</p>
             {missing.map((item) => (
               <label key={item.key}>
                 <span>
-                  <strong>{item.label}</strong>
-                  <small>{item.reason}</small>
+                  <strong>{inputLabel(item.label, locale)}</strong>
+                  <small>{inputLabel(item.reason, locale)}</small>
                 </span>
                 <input
                   type={item.expectedType === "date" ? "date" : "text"}
                   value={setup[item.key] ?? ""}
                   onChange={(event) => setSetup((current) => ({ ...current, [item.key]: event.target.value }))}
-                  aria-label={item.label}
+                  aria-label={inputLabel(item.label, locale)}
                 />
               </label>
             ))}
             <div style={{ marginTop: "1rem", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "0.75rem" }}>
               {setupSaved && (
                 <span style={{ display: "flex", alignItems: "center", gap: "0.4rem", color: "var(--color-success, #16a34a)", fontSize: "0.875rem", fontWeight: 500 }}>
-                  <Check size={16} /> Inputs saved
+                  <Check size={16} /> {locale === "fr" ? "Entrées enregistrées" : "Inputs saved"}
                 </span>
               )}
               <button type="button" className={styles.secondary} onClick={() => void saveSetup()} disabled={savingSetup}>
-                {savingSetup ? <LoaderCircle className={styles.spin} /> : <FileCheck2 />} Save inputs
+                {savingSetup ? <LoaderCircle className={styles.spin} /> : <FileCheck2 />} {locale === "fr" ? "Enregistrer les entrées" : "Save inputs"}
               </button>
             </div>
           </article>
           <article className={styles.contextPanel}>
-            <h2>Resolved context</h2>
-            <p><Check />Organization <strong>Workspace</strong></p>
-            <p><Check />Assessment facts <strong>Assessment</strong></p>
-            <p><Check />Linked evidence <strong>Evidence</strong></p>
-            <p><Check />Document language <strong>English</strong></p>
-            <footer>{document.preparation.knownInputCount} inputs resolved</footer>
+            <h2>{locale === "fr" ? "Contexte résolu" : "Resolved context"}</h2>
+            <p><Check />{locale === "fr" ? "Organisation" : "Organization"} <strong>{locale === "fr" ? "Espace" : "Workspace"}</strong></p>
+            <p><Check />{locale === "fr" ? "Faits d'évaluation" : "Assessment facts"} <strong>{locale === "fr" ? "Évaluation" : "Assessment"}</strong></p>
+            <p><Check />{locale === "fr" ? "Preuves liées" : "Linked evidence"} <strong>{locale === "fr" ? "Preuves" : "Evidence"}</strong></p>
+            <p><Check />{locale === "fr" ? "Langue du document" : "Document language"} <strong>{locale === "fr" ? "Français" : "English"}</strong></p>
+            <footer>{locale === "fr" ? `${document.preparation.knownInputCount} entrées résolues` : `${document.preparation.knownInputCount} inputs resolved`}</footer>
           </article>
         </section>
       ) : (
         <section className={styles.readyPanel}>
           <ShieldCheck />
-          <h2>Document context is ready</h2>
-          <p>Verified workspace, assessment and Registry inputs can be used to generate this draft.</p>
+          <h2>{locale === "fr" ? "Le contexte du document est prêt" : "Document context is ready"}</h2>
+          <p>{locale === "fr" ? "Les entrées vérifiées de l'espace, de l'évaluation et du registre peuvent être utilisées pour générer ce brouillon." : "Verified workspace, assessment and Registry inputs can be used to generate this draft."}</p>
         </section>
       )}
 
       <div className={styles.actionBar}>
-        <button type="button" className={styles.secondary} onClick={onBack}><ArrowLeft />Back</button>
-        <button type="button" className={styles.primary} disabled={missing.length > 0 && !complete} onClick={generate}><Upload />Generate draft</button>
+        <button type="button" className={styles.secondary} onClick={onBack}><ArrowLeft />{locale === "fr" ? "Retour" : "Back"}</button>
+        <button type="button" className={styles.primary} disabled={missing.length > 0 && !complete} onClick={generate}><Upload />{locale === "fr" ? "Générer le brouillon" : "Generate draft"}</button>
       </div>
     </>
   );
 }
 
-function Draft({ document, workspaceId, organization, onBack, onRefresh }: { document: AiDocumentUiEntry; workspaceId: string; organization: string; onBack: () => void; onRefresh: () => void }) {
+function Draft({ document, workspaceId, organization, onBack, onRefresh, locale }: { document: AiDocumentUiEntry; workspaceId: string; organization: string; onBack: () => void; onRefresh: () => void; locale: Locale }) {
   const [active, setActive] = useState(0);
   const originalSections = document.content?.sections ?? [];
   const [sections, setSections] = useState(originalSections);
@@ -746,33 +853,40 @@ function Draft({ document, workspaceId, organization, onBack, onRefresh }: { doc
       onRefresh();
     } catch (e) {
       console.error(e);
-      alert("Could not save changes");
+      alert(localizeAiError("Could not save changes", locale));
     } finally {
       setSaving(false);
     }
   }
 
-  async function handleExportPdf() {
+  async function handleExportPdf(event: React.MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
     setExporting(true);
     try {
       const { generateDocumentPdf } = await import("@/lib/ai/documents/pdf-export");
       const fullDoc: StructuredDocument = {
         documentType: document.documentType,
-        language: "en",
-        title: document.label,
+        language: locale,
+        title: documentLabel(document, locale),
         sections: sections,
       };
       const meta = {
-        organization: organization || "to be defined",
-        version: document.version || "to be defined",
+        organization: organization || (locale === "fr" ? "à définir" : "to be defined"),
+        version: document.version || (locale === "fr" ? "à définir" : "to be defined"),
         status: document.registryStatus === "finalized" ? "FINAL" : "DRAFT",
-        date: document.updatedAt ? new Date(document.updatedAt).toISOString().split("T")[0] : "to be defined",
-        classification: (document.setup?.document_classification as string) || "to be defined"
+        date: document.updatedAt ? new Date(document.updatedAt).toISOString().split("T")[0] : (locale === "fr" ? "à définir" : "to be defined"),
+        classification: (document.setup?.document_classification as string) || (locale === "fr" ? "à définir" : "to be defined")
       };
       await generateDocumentPdf(fullDoc, meta);
     } catch (e) {
-      console.error(e);
-      alert("Failed to export PDF");
+      const message = e instanceof Error
+        ? e.message
+        : e && typeof e === "object"
+          ? `PDF export failed (${e.constructor?.name || "unknown error"})`
+          : "Unknown PDF export error";
+      console.error("PDF export failed:", message);
+      alert(localizeAiError("Failed to export PDF", locale));
     } finally {
       setExporting(false);
     }
@@ -780,36 +894,36 @@ function Draft({ document, workspaceId, organization, onBack, onRefresh }: { doc
 
   return (
     <>
-      <Link prefetch={true} className={styles.back} href="/ai-documents"><ArrowLeft />AI Documents</Link>
+      <Link prefetch={true} className={styles.back} href="/ai-documents" onClick={onBack}><ArrowLeft />{locale === "fr" ? "Documents IA" : "AI Documents"}</Link>
       <header className={styles.draftHeader}>
         <div>
-          <h1>{document.label} <span className={`${styles.badge} ${styles[statusTone[document.status]]}`}>{statusLabel[document.status]}</span></h1>
+          <h1>{documentLabel(document, locale)} <span className={`${styles.badge} ${styles[statusTone[document.status]]}`}>{statusLabel(document.status, locale)}</span></h1>
           <p>
             Version <strong>{document.version || "—"}</strong><i />
-            Owner <strong>{document.ownerId || "Workspace member"}</strong><i />
-            Last updated <strong>{formatDate(document.updatedAt)}</strong>
+            {locale === "fr" ? "Propriétaire" : "Owner"} <strong>{document.ownerId || (locale === "fr" ? "Membre de l'espace" : "Workspace member")}</strong><i />
+            {locale === "fr" ? "Dernière mise à jour" : "Last updated"} <strong>{formatDate(document.updatedAt, locale)}</strong>
           </p>
         </div>
         <div className={styles.draftActions}>
           <button type="button" className={styles.secondary} onClick={handleExportPdf} disabled={exporting}>
-            {exporting ? <LoaderCircle className={styles.spin} /> : <Download />} Export PDF
+            {exporting ? <LoaderCircle className={styles.spin} /> : <Download />} {locale === "fr" ? "Exporter PDF" : "Export PDF"}
           </button>
           {!isFinalized ? (
             <>
-              <button type="button" className={styles.ghostButton} onClick={() => setSections(originalSections)} disabled={!hasChanges || saving}>Cancel</button>
+              <button type="button" className={styles.ghostButton} onClick={() => setSections(originalSections)} disabled={!hasChanges || saving}>{locale === "fr" ? "Annuler" : "Cancel"}</button>
               <button type="button" className={styles.primary} onClick={saveChanges} disabled={!hasChanges || saving}>
-                {saving ? <LoaderCircle className={styles.spin} /> : <FilePenLine />} Save changes
+                {saving ? <LoaderCircle className={styles.spin} /> : <FilePenLine />} {locale === "fr" ? "Enregistrer les modifications" : "Save changes"}
               </button>
             </>
           ) : (
-            <button type="button" className={styles.primary} disabled><Check />Finalized</button>
+            <button type="button" className={styles.primary} disabled><Check />{statusLabel("finalized", locale)}</button>
           )}
         </div>
       </header>
 
       <section className={styles.draftSection}>
         <aside>
-          <h2>Sections</h2>
+          <h2>{locale === "fr" ? "Sections" : "Sections"}</h2>
           {sections.map((section, index) => (
             <button type="button" onClick={() => setActive(index)} className={active === index ? styles.sectionActive : ""} key={section.sectionId}>
               <span>{index + 1}</span>
@@ -827,13 +941,13 @@ function Draft({ document, workspaceId, organization, onBack, onRefresh }: { doc
               
               {!isFinalized && !section.blocks && (
                 <div className={styles.editorToolbar}>
-                  <select aria-label="Format"><option>Paragraph</option></select>
+                  <select aria-label="Format"><option>{locale === "fr" ? "Paragraphe" : "Paragraph"}</option></select>
                   <i></i>
-                  <button type="button" onClick={() => window.document.execCommand("bold")} aria-label="Bold"><b>B</b></button>
-                  <button type="button" onClick={() => window.document.execCommand("italic")} aria-label="Italic"><em>I</em></button>
-                  <button type="button" onClick={() => window.document.execCommand("insertUnorderedList")} aria-label="Bullet List">•</button>
-                  <button type="button" onClick={() => window.document.execCommand("insertOrderedList")} aria-label="Numbered List">1.</button>
-                  <button type="button" onClick={() => window.document.execCommand("undo")} aria-label="Undo">↩</button>
+                  <button type="button" onClick={() => window.document.execCommand("bold")} aria-label={locale === "fr" ? "Gras" : "Bold"}><b>B</b></button>
+                  <button type="button" onClick={() => window.document.execCommand("italic")} aria-label={locale === "fr" ? "Italique" : "Italic"}><em>I</em></button>
+                  <button type="button" onClick={() => window.document.execCommand("insertUnorderedList")} aria-label={locale === "fr" ? "Liste à puces" : "Bullet List"}>•</button>
+                  <button type="button" onClick={() => window.document.execCommand("insertOrderedList")} aria-label={locale === "fr" ? "Liste numérotée" : "Numbered List"}>1.</button>
+                  <button type="button" onClick={() => window.document.execCommand("undo")} aria-label={locale === "fr" ? "Annuler" : "Undo"}>↩</button>
                 </div>
               )}
 
@@ -864,28 +978,28 @@ function Draft({ document, workspaceId, organization, onBack, onRefresh }: { doc
       </section>
       
       {isFinalized ? (
-        <p className={styles.readOnly}><Lock />Finalized document · Read-only</p>
+        <p className={styles.readOnly}><Lock />{locale === "fr" ? "Document finalisé · Lecture seule" : "Finalized document · Read-only"}</p>
       ) : (
-        <p className={styles.readOnly}><FilePenLine />Draft mode · Autosaved a moment ago</p>
+        <p className={styles.readOnly}><FilePenLine />{locale === "fr" ? "Mode brouillon · Enregistré automatiquement à l'instant" : "Draft mode · Autosaved a moment ago"}</p>
       )}
       
       <div className={styles.actionBar}>
-        <button type="button" className={styles.secondary} onClick={onBack}><ArrowLeft />Back</button>
+        <button type="button" className={styles.secondary} onClick={onBack}><ArrowLeft />{locale === "fr" ? "Retour" : "Back"}</button>
         {!isFinalized && (
           <button type="button" className={styles.primary} onClick={() => setShowFinalize(true)} disabled={hasChanges}>
-            <Check />Finalize
+            <Check />{locale === "fr" ? "Finaliser" : "Finalize"}
           </button>
         )}
       </div>
       
       {showFinalize && (
-        <FinalizeModal document={document} workspaceId={workspaceId} onClose={() => setShowFinalize(false)} onRefresh={onRefresh} />
+        <FinalizeModal document={document} workspaceId={workspaceId} onClose={() => setShowFinalize(false)} onRefresh={onRefresh} locale={locale} />
       )}
     </>
   );
 }
 
-function FinalizeModal({ document, workspaceId, onClose, onRefresh }: { document: AiDocumentUiEntry; workspaceId: string; onClose: () => void; onRefresh: () => void }) {
+function FinalizeModal({ document, workspaceId, onClose, onRefresh, locale }: { document: AiDocumentUiEntry; workspaceId: string; onClose: () => void; onRefresh: () => void; locale: Locale }) {
   const [finalizing, setFinalizing] = useState(false);
 
   async function handleFinalize() {
@@ -906,7 +1020,7 @@ function FinalizeModal({ document, workspaceId, onClose, onRefresh }: { document
       onRefresh();
       onClose();
     } catch {
-      alert("Could not finalize document");
+      alert(localizeAiError("Could not finalize document", locale));
       setFinalizing(false);
     }
   }
@@ -918,26 +1032,26 @@ function FinalizeModal({ document, workspaceId, onClose, onRefresh }: { document
         <header>
           <ClipboardList className={styles.modalIcon} />
           <div>
-            <h2>Finalize document</h2>
-            <p>This version will become finalized and can no longer be edited as a draft.</p>
+            <h2>{locale === "fr" ? "Finaliser le document" : "Finalize document"}</h2>
+            <p>{locale === "fr" ? "Cette version deviendra finalisée et ne pourra plus être modifiée comme brouillon." : "This version will become finalized and can no longer be edited as a draft."}</p>
           </div>
         </header>
         
         <div className={styles.modalDetails}>
-          <h3><Building2 /> {document.label}</h3>
+          <h3><Building2 /> {documentLabel(document, locale)}</h3>
           <p><span>Version</span> <strong>{document.version || "1.0"}</strong></p>
-          <p><span>Owner</span> <strong>{document.ownerId || "Workspace Member"}</strong></p>
-          <p><span>Effective date</span> <strong>{formatDate(new Date().toISOString())}</strong></p>
+          <p><span>{locale === "fr" ? "Propriétaire" : "Owner"}</span> <strong>{document.ownerId || (locale === "fr" ? "Membre de l'espace" : "Workspace Member")}</strong></p>
+          <p><span>{locale === "fr" ? "Date d'entrée en vigueur" : "Effective date"}</span> <strong>{formatDate(new Date().toISOString(), locale)}</strong></p>
         </div>
         
         <div className={styles.infoBanner}>
-          <CircleCheck /> A finalized copy will be available in Evidence Room.
+          <CircleCheck /> {locale === "fr" ? "Une copie finalisée sera disponible dans la salle des preuves." : "A finalized copy will be available in Evidence Room."}
         </div>
         
         <footer>
-          <button type="button" className={styles.secondary} onClick={onClose} disabled={finalizing}>Cancel</button>
+          <button type="button" className={styles.secondary} onClick={onClose} disabled={finalizing}>{locale === "fr" ? "Annuler" : "Cancel"}</button>
           <button type="button" className={styles.primary} onClick={handleFinalize} disabled={finalizing}>
-            {finalizing ? <LoaderCircle className={styles.spin} /> : <ClipboardList />} Finalize document
+            {finalizing ? <LoaderCircle className={styles.spin} /> : <ClipboardList />} {locale === "fr" ? "Finaliser le document" : "Finalize document"}
           </button>
         </footer>
       </div>
@@ -950,79 +1064,81 @@ function Available({
   workspaceId,
   onBack,
   onOpenEvidence,
+  locale,
 }: {
   document: AiDocumentUiEntry;
   workspaceId: string;
   onBack: () => void;
   onOpenEvidence: () => void;
+  locale: Locale;
 }) {
   return (
     <>
-      <Link prefetch={true} className={styles.back} href="/ai-documents"><ArrowLeft />AI Documents</Link>
+      <Link prefetch={true} className={styles.back} href="/ai-documents" onClick={onBack}><ArrowLeft />{locale === "fr" ? "Documents IA" : "AI Documents"}</Link>
       <header className={styles.detailHeader}>
         <div>
-          <h1>{document.label}</h1>
+          <h1>{documentLabel(document, locale)}</h1>
           <div className={styles.detailBadges}>
-            <span className={`${styles.badge} ${styles.already_available}`}>{statusLabel.already_available}</span>
-            <span className={styles.typeBadge}>{typeLabel(document.documentType)}</span>
+            <span className={`${styles.badge} ${styles.already_available}`}>{statusLabel("already_available", locale)}</span>
+            <span className={styles.typeBadge}>{typeLabel(document.documentType, locale)}</span>
           </div>
         </div>
-        <button type="button" className={styles.primary} onClick={onOpenEvidence}><FolderOpen />Open in Evidence Room</button>
+        <button type="button" className={styles.primary} onClick={onOpenEvidence}><FolderOpen />{locale === "fr" ? "Ouvrir dans la salle des preuves" : "Open in Evidence Room"}</button>
       </header>
 
-      <div className={styles.infoBanner}><CircleCheck />Existing document found in Evidence Room.</div>
+      <div className={styles.infoBanner}><CircleCheck />{locale === "fr" ? "Document existant trouvé dans la salle des preuves." : "Existing document found in Evidence Room."}</div>
 
       <section className={styles.availableCard}>
-        <h2>Document information</h2>
-        <h3><FileText />{document.filename || "Document"}</h3>
+        <h2>{locale === "fr" ? "Informations du document" : "Document information"}</h2>
+        <h3><FileText />{document.filename || (locale === "fr" ? "Document" : "Document")}</h3>
         <div>
           <span>Version<strong>{document.version || "—"}</strong></span>
-          <span>Owner<strong>{document.ownerId || "Workspace member"}</strong></span>
-          <span>Review date<strong>{formatDate(document.reviewDate)}</strong></span>
+          <span>{locale === "fr" ? "Propriétaire" : "Owner"}<strong>{document.ownerId || (locale === "fr" ? "Membre de l'espace" : "Workspace member")}</strong></span>
+          <span>{locale === "fr" ? "Date de revue" : "Review date"}<strong>{formatDate(document.reviewDate, locale)}</strong></span>
         </div>
       </section>
 
       <div className={styles.coverage}>
         <ShieldCheck />
-        <span><strong>Document coverage</strong><small>Recognized type: {document.label}</small></span>
-        <b><Check />Available</b>
+        <span><strong>{locale === "fr" ? "Couverture du document" : "Document coverage"}</strong><small>{locale === "fr" ? "Type reconnu" : "Recognized type"}: {documentLabel(document, locale)}</small></span>
+        <b><Check />{locale === "fr" ? "Disponible" : "Available"}</b>
       </div>
 
       <div className={styles.actionBar}>
-        <button type="button" className={styles.secondary} onClick={onBack}><ArrowLeft />Back</button>
-        <a className={styles.secondary} href={`/api/evidence/${document.evidenceId}/download?workspaceId=${encodeURIComponent(workspaceId)}`}>Download</a>
-        <button type="button" className={styles.primary} onClick={onOpenEvidence}><FolderOpen />Open in Evidence Room</button>
+        <button type="button" className={styles.secondary} onClick={onBack}><ArrowLeft />{locale === "fr" ? "Retour" : "Back"}</button>
+        <a className={styles.secondary} href={`/api/evidence/${document.evidenceId}/download?workspaceId=${encodeURIComponent(workspaceId)}`}>{locale === "fr" ? "Télécharger" : "Download"}</a>
+        <button type="button" className={styles.primary} onClick={onOpenEvidence}><FolderOpen />{locale === "fr" ? "Ouvrir dans la salle des preuves" : "Open in Evidence Room"}</button>
       </div>
     </>
   );
 }
 
-function GenerationState({ title, onBack }: { title: string; onBack: () => void }) {
+function GenerationState({ title, onBack, locale }: { title: string; onBack: () => void; locale: Locale }) {
   return (
     <div className={styles.page}>
       <div className={styles.generation}>
         <span><FileText /></span>
-        <h1>Generating {title}</h1>
+        <h1>{locale === "fr" ? `Génération de ${title}` : `Generating ${title}`}</h1>
         <div className={styles.indeterminate}><i /></div>
-        <p><LoaderCircle className={styles.spin} />Generating document... <strong>In progress</strong></p>
-        <p><CircleDashed />Validating generated content <strong>Waiting</strong></p>
-        <p><CopyCheck />Persisting validated draft <strong>Waiting</strong></p>
-        <small>This may take a moment. You can safely return to documents.</small>
-        <button type="button" className={styles.secondary} onClick={onBack}>Back to documents</button>
+        <p><LoaderCircle className={styles.spin} />{locale === "fr" ? "Génération du document..." : "Generating document..."} <strong>{locale === "fr" ? "En cours" : "In progress"}</strong></p>
+        <p><CircleDashed />{locale === "fr" ? "Validation du contenu généré" : "Validating generated content"} <strong>{locale === "fr" ? "En attente" : "Waiting"}</strong></p>
+        <p><CopyCheck />{locale === "fr" ? "Enregistrement du brouillon validé" : "Persisting validated draft"} <strong>{locale === "fr" ? "En attente" : "Waiting"}</strong></p>
+        <small>{locale === "fr" ? "Cela peut prendre un moment. Vous pouvez revenir aux documents en toute sécurité." : "This may take a moment. You can safely return to documents."}</small>
+        <button type="button" className={styles.secondary} onClick={onBack}>{locale === "fr" ? "Retour aux documents" : "Back to documents"}</button>
       </div>
     </div>
   );
 }
 
-function ErrorState({ title, message, retry, back }: { title: string; message: string; retry: () => void; back: () => void }) {
+function ErrorState({ title, message, retry, back, locale }: { title: string; message: string; retry: () => void; back: () => void; locale: Locale }) {
   return (
     <div className={styles.errorState}>
       <span><AlertCircle /></span>
-      <h1>Draft generation could not be completed</h1>
+      <h1>{locale === "fr" ? "La génération du brouillon n'a pas pu être terminée" : "Draft generation could not be completed"}</h1>
       <p>{message}</p>
       <div><FileText />{title}</div>
-      <button type="button" className={styles.primary} onClick={retry}><RefreshCw />Try again</button>
-      <button type="button" className={styles.secondary} onClick={back}><ArrowLeft />Back to documents</button>
+      <button type="button" className={styles.primary} onClick={retry}><RefreshCw />{locale === "fr" ? "Réessayer" : "Try again"}</button>
+      <button type="button" className={styles.secondary} onClick={back}><ArrowLeft />{locale === "fr" ? "Retour aux documents" : "Back to documents"}</button>
     </div>
   );
 }

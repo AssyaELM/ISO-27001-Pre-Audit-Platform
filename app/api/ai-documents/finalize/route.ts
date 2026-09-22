@@ -4,9 +4,33 @@ import { authenticatedEvidenceClient } from "@/lib/evidence/http";
 import { EVIDENCE_BUCKET, generatedStoragePath } from "@/lib/evidence/files";
 import { documentMetadataColumns } from "@/lib/evidence/metadata";
 import { authenticatedWorkspaceClient, WorkspaceHttpError } from "@/lib/workspaces/authenticated-client";
-import type { StructuredDocument } from "@/lib/ai/documents/generation-schema";
+import type { StructuredDocument, StructuredDocumentBlock } from "@/lib/ai/documents/generation-schema";
 
 export const runtime = "nodejs";
+
+function blockToMarkdown(block: StructuredDocumentBlock): string {
+  switch (block.type) {
+    case "heading":
+      return `${"#".repeat(block.level - 1)} ${block.content}`;
+    case "paragraph":
+      return block.content;
+    case "bullet_list":
+      return block.items.map((item) => `- ${item}`).join("\n");
+    case "numbered_list":
+      return block.items.map((item, index) => `${index + 1}. ${item}`).join("\n");
+    case "table": {
+      const header = block.headers.length ? `| ${block.headers.join(" | ")} |` : "";
+      const separator = block.headers.length ? `| ${block.headers.map(() => "---").join(" | ")} |` : "";
+      const rows = block.rows.map((row) => `| ${row.join(" | ")} |`).join("\n");
+      return [header, separator, rows].filter(Boolean).join("\n");
+    }
+  }
+}
+
+function sectionToMarkdown(section: StructuredDocument["sections"][number]): string {
+  if (section.blocks?.length) return section.blocks.map(blockToMarkdown).join("\n\n");
+  return section.content ?? "";
+}
 
 export async function POST(request: Request) {
   try {
@@ -37,7 +61,7 @@ export async function POST(request: Request) {
     let markdown = `# ${content.title}\n\n`;
     content.sections.forEach((section, index) => {
       markdown += `## ${index + 1}. ${section.title}\n\n`;
-      markdown += `${section.content}\n\n`;
+      markdown += `${sectionToMarkdown(section)}\n\n`;
     });
     
     const markdownBytes = Buffer.from(markdown, "utf-8");

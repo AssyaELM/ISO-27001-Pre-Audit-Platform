@@ -16,7 +16,9 @@
 .crumb strong { font-weight: 680; }
 .profileTools { display: flex; align-items: center; gap: 10px; }
 .language,
-.workspaceStatus { padding: 9px 13px; border: 1px solid #dce5eb; border-radius: 9px; background: #fff; font-size: 14px; white-space: nowrap; }
+.workspaceStatus { padding: 9px 13px; border: 1px solid #dce5eb; border-radius: 9px; background: #fff; color: #263b52; font-size: 14px; font-weight: 400; white-space: nowrap; }
+.language { min-width: 48px; cursor: pointer; }
+.language:hover { border-color: #7fbfbd; color: #007f80; }
 .workspaceStatus { display: flex; align-items: center; gap: 7px; }
 .workspaceStatus i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #12d5ca; }
 .profileName { margin-left: 24px; font-size: 14px; white-space: nowrap; }

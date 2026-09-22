@@ -1,6 +1,11 @@
 import { StructuredDocumentBlock } from "./generation-schema";
 import { AiDocumentGenerationRequest, AiDocumentGenerationSection } from "../providers/types";
-import { AI_DOCUMENT_LABELS, AiDocumentType } from "../../ai-documents/registry";
+import { AI_DOCUMENT_LABELS } from "../../ai-documents/registry";
+import type { AiDocumentType } from "../../ai-documents/registry";
+import { ACCESS_CONTROL_PRINCIPLES } from "../../ai-documents/access-control-policy";
+import { BACKUP_AND_RECOVERY_PRINCIPLES, BACKUP_AND_RECOVERY_TERMS } from "../../ai-documents/backup-and-recovery-policy";
+import { INCIDENT_MANAGEMENT_PRINCIPLES, INCIDENT_MANAGEMENT_TERMS } from "../../ai-documents/incident-management-procedure";
+import { INFORMATION_ASSET_MANAGEMENT_PRINCIPLES, INFORMATION_ASSET_MANAGEMENT_TERMS } from "../../ai-documents/information-asset-management-policy";
 
 export function hydrateNonGeneratedSection(
   request: AiDocumentGenerationRequest,
@@ -22,7 +27,70 @@ export function hydrateNonGeneratedSection(
     }
   }
 
+  if (sectionReq.sectionId === "document_control") return buildGenericDocumentControl(request);
+  if (sectionReq.sectionId === "policy_review_and_approval" || sectionReq.sectionId === "procedure_review_and_approval") {
+    return buildGenericReviewAndApproval(request, sectionReq.sectionId.startsWith("procedure"));
+  }
+
+  const staticBlocks = buildStaticBlocks(request.documentType, sectionReq.sectionId);
+  if (staticBlocks) return staticBlocks;
+
   throw new Error(`Unhandled deterministic section: ${sectionReq.sectionId} for document type: ${request.documentType}`);
+}
+
+function inputValue(req: AiDocumentGenerationRequest, ...keys: string[]): string {
+  for (const key of keys) {
+    const value = req.resolvedInputs?.[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return "to be defined";
+}
+
+function buildGenericDocumentControl(req: AiDocumentGenerationRequest): StructuredDocumentBlock[] {
+  return [{
+    type: "table",
+    headers: ["Property", "Value"],
+    rows: [
+      ["Document Version", inputValue(req, "version", "document_version")],
+      ["Document Classification", inputValue(req, "classification", "document_classification")],
+      ["Document Owner", inputValue(req, "policy_owner", "document_owner", "asset_policy_owner", "procedure_owner")],
+      ["Approver", inputValue(req, "approver", "approved_by")],
+      ["Review Date or Frequency", inputValue(req, "review_plan", "review_date")],
+    ],
+  }];
+}
+
+function buildGenericReviewAndApproval(req: AiDocumentGenerationRequest, procedure: boolean): StructuredDocumentBlock[] {
+  return [{
+    type: "table",
+    headers: ["Role", "Name", "Review date", "Status"],
+    rows: [[procedure ? "Procedure approver" : "Policy approver", inputValue(req, "approver", "approved_by"), inputValue(req, "review_plan", "review_date"), "To be approved"]],
+  }];
+}
+
+function buildStaticBlocks(documentType: string, sectionId: string): StructuredDocumentBlock[] | undefined {
+  if (documentType === "access_control_policy" && sectionId === "access_control_principles") {
+    return [{ type: "bullet_list", items: ACCESS_CONTROL_PRINCIPLES.map((principle) => `${principle.label}: ${principle.text}`) }];
+  }
+  if (documentType === "incident_management_procedure" && sectionId === "terms_and_definitions") {
+    return [{ type: "table", headers: ["Term", "Definition"], rows: Object.entries(INCIDENT_MANAGEMENT_TERMS).map(([term, definition]) => [term.replaceAll("_", " "), definition]) }];
+  }
+  if (documentType === "incident_management_procedure" && sectionId === "incident_management_principles") {
+    return [{ type: "bullet_list", items: [...INCIDENT_MANAGEMENT_PRINCIPLES] }];
+  }
+  if (documentType === "backup_and_recovery_policy" && sectionId === "terms_and_definitions") {
+    return [{ type: "table", headers: ["Term", "Definition"], rows: Object.entries(BACKUP_AND_RECOVERY_TERMS).map(([term, definition]) => [term.replaceAll("_", " "), definition]) }];
+  }
+  if (documentType === "backup_and_recovery_policy" && sectionId === "backup_and_recovery_principles") {
+    return [{ type: "bullet_list", items: [...BACKUP_AND_RECOVERY_PRINCIPLES] }];
+  }
+  if (documentType === "information_asset_management_policy" && sectionId === "terms_and_definitions") {
+    return [{ type: "table", headers: ["Term", "Definition"], rows: Object.entries(INFORMATION_ASSET_MANAGEMENT_TERMS).map(([term, definition]) => [term.replaceAll("_", " "), definition]) }];
+  }
+  if (documentType === "information_asset_management_policy" && sectionId === "asset_management_principles") {
+    return [{ type: "bullet_list", items: [...INFORMATION_ASSET_MANAGEMENT_PRINCIPLES] }];
+  }
+  return undefined;
 }
 
 function buildDocumentControl(req: AiDocumentGenerationRequest): StructuredDocumentBlock[] {
@@ -89,7 +157,7 @@ function buildInformationSecurityPolicyFramework(req: AiDocumentGenerationReques
     blocks.push({
       type: "bullet_list",
       items: frameworkDocs.map((entry) => {
-        const docType = typeof entry === "string" ? entry : entry.documentType;
+        const docType = (typeof entry === "string" ? entry : entry.documentType) as keyof typeof AI_DOCUMENT_LABELS;
         const status = typeof entry === "string" ? "Available" : entry.status.replaceAll("_", " ");
         return `${AI_DOCUMENT_LABELS[docType] || docType} (${status})`;
       })

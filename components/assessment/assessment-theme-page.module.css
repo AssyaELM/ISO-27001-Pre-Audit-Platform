@@ -55,7 +55,9 @@
 .breadcrumb b { color: #91a0b3; font-size: 20px; font-weight: 400; }
 .profileTools { display: flex; align-items: center; gap: 10px; }
 .language,
-.workspaceStatus { padding: 9px 13px; border: 1px solid var(--line); border-radius: 9px; background: #fff; font-size: 14px; white-space: nowrap; }
+.workspaceStatus { padding: 9px 13px; border: 1px solid var(--line); border-radius: 9px; background: #fff; color: #263b52; font-size: 14px; font-weight: 400; white-space: nowrap; }
+.language { min-width: 48px; cursor: pointer; }
+.language:hover { border-color: #7fbfbd; color: #007f80; }
 .workspaceStatus { display: flex; align-items: center; gap: 7px; }
 .profileName { margin-left: 24px; font-size: 14px; white-space: nowrap; }
 .avatar { display: grid; width: 38px; height: 38px; place-items: center; border: 2px solid #fff; border-radius: 50%; background: #153e56; color: #fff; font-weight: 750; box-shadow: 0 2px 8px rgba(3, 25, 43, .16); }
@@ -84,10 +86,10 @@
   .brand { height: 68px; padding: 0 24px; font-size: 23px; }
   .workspace { padding: 20px 24px; }
   .workspace strong { max-width: 145px; font-size: 14px; }
-  .workspace small { font-size: 11px; }
+  .workspace small { font-size: 12px; }
   .sidebar nav { padding-top: 12px; }
   .sidebar nav a,
-  .settings { min-height: 53px; padding: 0 24px; font-size: 14px; }
+  .settings { min-height: 53px; padding: 0 24px; font-size: 15px; }
   .settings { margin-bottom: 13px; }
   .content { padding: 0 18px 18px; }
   .topbar { height: 64px; }
@@ -97,15 +99,15 @@
   .panel { min-height: calc(100vh - 92px); padding: 40px 38px; }
   .panel h1 { font-size: 28px; }
   .panel > p { font-size: 16px; }
-  .panel > small { font-size: 13px; }
+  .panel > small { color: #50617a; font-size: 14px; }
   .grid { gap: 15px; margin-top: 16px; }
   .card { min-height: 185px; grid-template-columns: 78px minmax(0, 1fr) auto; gap: 18px; padding: 23px 26px; }
   .card > img { width: 64px; height: 64px; }
   .card h2 { font-size: 18px; }
-  .card p { margin-bottom: 18px; font-size: 13px; }
-  .cardBody > span { padding: 8px 11px; font-size: 12px; }
+  .card p { margin-bottom: 18px; color: #465b72; font-size: 14px; }
+  .cardBody > span { padding: 8px 11px; font-size: 13px; }
   .action,
-  .unavailable { padding: 10px 23px; font-size: 13px; }
+  .unavailable { padding: 10px 23px; font-size: 14px; }
 }
 
 @media (max-width: 900px) {
