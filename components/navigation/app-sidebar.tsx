@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import styles from "./app-sidebar.module.css";
 import { NormCoreLogo } from "@/components/branding/normcore-logo";
+import { useStoredLanguage } from "@/components/language-preference";
 
 type AppSidebarProps = {
   organization?: string;
@@ -23,21 +24,23 @@ type AppSidebarProps = {
 };
 
 const navigation = [
-  [LayoutDashboard, "Dashboard", "/dashboard"],
-  [ClipboardList, "Assessment", "/assessment"],
-  [Gauge, "Gap Analysis", "/gap-analysis"],
-  [Check, "Remediation Plan", "/remediation-plan"],
-  [FolderOpen, "Evidence Room", "/evidence-room"],
-  [Sparkles, "AI Documents", "/ai-documents"],
+  [LayoutDashboard, "Dashboard", "Tableau de bord", "/dashboard"],
+  [ClipboardList, "Assessment", "Évaluation", "/assessment"],
+  [Gauge, "Gap Analysis", "Analyse des écarts", "/gap-analysis"],
+  [Check, "Remediation Plan", "Plan de remédiation", "/remediation-plan"],
+  [FolderOpen, "Evidence Room", "Salle des preuves", "/evidence-room"],
+  [Sparkles, "AI Documents", "Documents IA", "/ai-documents"],
 ] as const;
 
 function isActive(pathname: string, href: string) {
-  return href === "/assessment" ? pathname === href || pathname.startsWith(`${href}/`) : pathname === href;
+  return pathname === href || (href === "/assessment" && pathname.startsWith(`${href}/`));
 }
 
 export function AppSidebar({ organization = "", workspaceId, mobileOpen = false, onClose }: AppSidebarProps) {
   const pathname = usePathname();
-  const status = workspaceId ? "Active workspace" : "Setup";
+  const { language } = useStoredLanguage();
+  const french = language === "fr";
+  const status = workspaceId ? (french ? "Espace actif" : "Active workspace") : (french ? "Configuration" : "Setup");
 
   return (
     <aside className={`${styles.sidebar} ${mobileOpen ? styles.sidebarOpen : ""}`}>
@@ -49,13 +52,13 @@ export function AppSidebar({ organization = "", workspaceId, mobileOpen = false,
         <div><strong>{organization || "Workspace"}</strong><small><i />{status}</small></div>
       </div>
       <nav aria-label="Application navigation">
-        {navigation.map(([Icon, label, href]) => (
-          <Link key={href} href={href} className={isActive(pathname, href) ? styles.active : ""} onClick={onClose}>
-            <Icon aria-hidden="true" /><span>{label}</span>
+        {navigation.map(([Icon, labelEn, labelFr, href]) => (
+          <Link key={href} prefetch={true} href={href} className={isActive(pathname, href) ? styles.active : ""} onClick={onClose}>
+            <Icon aria-hidden="true" /><span>{french ? labelFr : labelEn}</span>
           </Link>
         ))}
       </nav>
-      <Link className={styles.settings} href="/dashboard" onClick={onClose}><Settings aria-hidden="true" /><span>Settings</span></Link>
+      <Link className={`${styles.settings} ${pathname === "/settings" ? styles.active : ""}`} prefetch={true} href="/settings" onClick={onClose}><Settings aria-hidden="true" /><span>{french ? "Paramètres" : "Settings"}</span></Link>
     </aside>
   );
 }

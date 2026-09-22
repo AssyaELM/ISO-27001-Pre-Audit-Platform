@@ -57,7 +57,10 @@ export function validateInformationSecurityPolicyGrounding(document: StructuredD
 
   for (const pattern of [...groundedRoleClaims, ...groundedSystemClaims]) {
     const match = content.match(pattern);
-    if (match && !sourceText.includes(match[0].toLowerCase())) {
+    const matchIndex = match ? content.indexOf(match[0]) : -1;
+    const followingText = match && matchIndex >= 0 ? content.slice(matchIndex, matchIndex + match[0].length + 24) : "";
+    const isFutureNormativeRole = Boolean(match && groundedRoleClaims.includes(pattern) && /\b(?:shall|must|will)\b/i.test(followingText));
+    if (match && !isFutureNormativeRole && !sourceText.includes(match[0].toLowerCase())) {
       errors.push("invented organizational detail", `unsupported organizational claim: ${match[0]}`);
     }
   }

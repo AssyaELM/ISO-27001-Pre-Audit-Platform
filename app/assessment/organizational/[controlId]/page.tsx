@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useStoredLanguage } from "@/components/language-preference";
+import { LanguageToggle } from "@/components/language-toggle";
 import { QuestionEvidence } from "@/components/assessment/question-evidence";
 import { AppSidebar } from "@/components/navigation/app-sidebar";
 import { workspaceDisplayName } from "@/lib/workspaces/display-name";
@@ -119,8 +120,9 @@ export default function OrganizationalControlPage() {
   const [loading, setLoading] = useState(!getAssessmentCache());
   const [saving, setSaving] = useState("");
   const [error, setError] = useState("");
-  const [notApplicableQuestionId, setNotApplicableQuestionId] = useState("");
   const [justifications, setJustifications] = useState<Record<string, string>>({});
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, AssessmentAnswerValue>>({});
+  const answerQueues = useRef(new Map<string, Promise<void>>());
   const [controlJustifications, setControlJustifications] = useState<Record<string, string>>({});
 
   const resolvedAssessment = useMemo(
@@ -232,43 +234,35 @@ export default function OrganizationalControlPage() {
   }
 
   async function answer(questionId: string, answerValue: AssessmentAnswerValue) {
-    if (!workspaceId || saving) return;
+    if (!workspaceId) return;
     if (answerValue === "not_applicable" && !justifications[questionId]?.trim()) {
-      setNotApplicableQuestionId(questionId);
       return;
     }
     const justification = answerValue === "not_applicable" ? justifications[questionId].trim() : undefined;
-    setSaving(questionId);
-    setError("");
-    try {
-      const headers = await authenticatedHeaders();
-      const response = await fetch("/api/assessment/responses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...headers },
-        body: JSON.stringify({
-          workspaceId,
-          theme: "organizational",
-          controlId,
-          questionId,
-          answer: answerValue,
-          justification,
-        }),
-      });
-      const body = await response.json() as Response & { error?: string };
-      if (!response.ok) throw new Error(body.error || "Unable to save answer.");
-      setResponses((current) => [
-        ...current.filter((item) => !(item.controlId === controlId && item.questionId === questionId)),
-        body,
-      ]);
-      const { updateAssessmentResponses } = await import("@/lib/assessment/client-cache");
-      updateAssessmentResponses((current) => [
-        ...current.filter((item) => !(item.controlId === controlId && item.questionId === questionId)),
-        body as unknown as import("@/content/assessment-infrastructure").AssessmentAnswerRecord,
-      ]);
-      setNotApplicableQuestionId("");
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : (locale === "fr" ? "Impossible d’enregistrer la réponse." : "Unable to save answer."));
-    } finally {
+    const previous = answerQueues.current.get(questionId) ?? Promise.resolve();
+    const pending = previous.catch(() => undefined).then(async () => {
+      setSaving(questionId);
+      setError("");
+      try {
+        const headers = await authenticatedHeaders();
+        const response = await fetch("/api/assessment/responses", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...headers },
+          body: JSON.stringify({ workspaceId, theme: "organizational", controlId, questionId, answer: answerValue, justification }),
+        });
+        const body = await response.json() as Response & { error?: string };
+        if (!response.ok) throw new Error(body.error || "Unable to save answer.");
+        setResponses((current) => [...current.filter((item) => !(item.controlId === controlId && item.questionId === questionId)), body]);
+        const { updateAssessmentResponses } = await import("@/lib/assessment/client-cache");
+        updateAssessmentResponses((current) => [...current.filter((item) => !(item.controlId === controlId && item.questionId === questionId)), body as unknown as import("@/content/assessment-infrastructure").AssessmentAnswerRecord]);
+      } catch (cause) {
+        setError(cause instanceof Error ? cause.message : (locale === "fr" ? "Impossible d’enregistrer la réponse." : "Unable to save answer."));
+      }
+    });
+    answerQueues.current.set(questionId, pending);
+    await pending;
+    if (answerQueues.current.get(questionId) === pending) {
+      answerQueues.current.delete(questionId);
       setSaving("");
     }
   }
@@ -332,7 +326,7 @@ export default function OrganizationalControlPage() {
   return <main className={styles.shell}>
     <AppSidebar organization={organization} workspaceId={workspaceId} />
     <section className={styles.content}>
-      <header className={styles.topbar}><p>{organization && <><span>{organization}</span><b>/</b></>}<span>{locale === "fr" ? "Évaluation" : "Assessment"}</span><b>/</b><strong>{locale === "fr" ? "Contrôles organisationnels" : "Organizational Controls"}</strong></p><span className={styles.language}>EN / FR</span></header>
+      <header className={styles.topbar}><p>{organization && <><span>{organization}</span><b>/</b></>}<span>{locale === "fr" ? "Évaluation" : "Assessment"}</span><b>/</b><strong>{locale === "fr" ? "Contrôles organisationnels" : "Organizational Controls"}</strong></p><LanguageToggle className={styles.language} /></header>
       <section className={styles.titleCard}><div><h1>{locale === "fr" ? "Contrôles organisationnels" : "Organizational Controls"}</h1><p>ISO/IEC 27001:2022 — Annex A.5</p></div><div className={styles.titleProgress}><span>{control.code} {locale === "fr" ? `sur ${organizationalControls.length}` : `of ${organizationalControls.length}`}</span><i><b style={{ width: `${(completedControls / organizationalControls.length) * 100}%` }} /></i></div></section>
       <div className={styles.assessmentGrid}>
         <aside className={styles.controls}>
@@ -345,7 +339,7 @@ export default function OrganizationalControlPage() {
           {!loading && !workspaceId && <p className={styles.state}>{error || (locale === "fr" ? "Aucun espace d’évaluation n’est disponible." : "No assessment workspace is available.")}</p>}
           {!loading && resolution.requiredQuickContextQuestions.map((item) => <section style={{ order: 1 }} key={item.key} className={styles.quickContext}><div><h3>{locale === "fr" ? "Contexte rapide" : "Quick context"}</h3><p>{locale === "fr" ? "Cette réponse adapte uniquement les questions conditionnelles. Elle n’est pas évaluée et ne génère aucun gap." : "This answer only adapts conditional questions. It is not assessed and does not generate gaps."}</p></div><fieldset><legend>{item.question[locale]}</legend><div>{(["yes", "no", "not_sure"] as OrganizationalContextDecision[]).map((value) => <button key={value} type="button" disabled={Boolean(saving)} onClick={() => void saveContext(item.key, value)}>{value === "yes" ? (locale === "fr" ? "Oui" : "Yes") : value === "no" ? (locale === "fr" ? "Non" : "No") : (locale === "fr" ? "Je ne sais pas" : "Not sure")}</button>)}</div></fieldset></section>)}
           {!loading && resolution.controlApplicability === "not_applicable" && <section style={{ order: 1 }} className={styles.quickContext}><div><h3>{locale === "fr" ? "Applicabilité du contrôle" : "Control applicability"}</h3><p>{locale === "fr" ? "L’exclusion nécessite une justification et une revue d’applicabilité/SoA." : "Exclusion requires a justification and an applicability/SoA review."}</p></div><div className={styles.justification}><label htmlFor={`control-justification-${controlId}`}>{locale === "fr" ? "Justification requise pour « Non applicable »" : "Required justification for Not applicable"}</label><textarea id={`control-justification-${controlId}`} value={controlJustification} onChange={(event) => setControlJustifications((current) => ({ ...current, [controlId]: event.target.value }))} rows={3} disabled={Boolean(saving)} /><button type="button" disabled={!controlJustification.trim() || Boolean(saving)} onClick={() => void saveControlApplicability()}>{locale === "fr" ? "Enregistrer la justification" : "Save justification"}</button>{control.applicabilityKey && <button type="button" disabled={Boolean(saving)} onClick={() => void saveContext(control.applicabilityKey, "yes")}>{locale === "fr" ? "Réactiver le contrôle" : "Mark control as applicable"}</button>}</div></section>}
-          {questions.map((question, index) => { const saved = responses.find((item) => item.controlId === controlId && item.questionId === question.id); const showJustification = notApplicableQuestionId === question.id || saved?.answer === "not_applicable"; const justification = justifications[question.id] ?? saved?.justification ?? ""; return <article id={question.id} className={styles.question} key={question.id}><span className={styles.category}>{questionTypeLabel(question.type)}</span><h3>{index + 1}. <b>{question.question[locale]}</b></h3><div className={styles.answers}>{assessmentAnswerValues.map((value) => <button key={value} disabled={Boolean(saving) || !workspaceId} onClick={() => void answer(question.id, value)} className={`${styles[`answer_${value}`]} ${saved?.answer === value ? styles.answerSelected : ""}`}><i />{answerLabel(value, locale)}</button>)}</div>{showJustification && <div className={styles.justification}><label htmlFor={`justification-${question.id}`}>{locale === "fr" ? "Justification requise pour « Non applicable »" : "Required justification for Not applicable"}</label><textarea id={`justification-${question.id}`} value={justification} onChange={(event) => setJustifications((current) => ({ ...current, [question.id]: event.target.value }))} rows={3} disabled={Boolean(saving)} /><button type="button" disabled={!justification.trim() || Boolean(saving)} onClick={() => void answer(question.id, "not_applicable")}>{locale === "fr" ? "Enregistrer la justification" : "Save justification"}</button></div>}<QuestionEvidence workspaceId={workspaceId} themeId="organizational" controlId={controlId} questionId={question.id} locale={locale} guidance={question.evidence} /></article>; })}
+          {questions.map((question, index) => { const saved = responses.find((item) => item.controlId === controlId && item.questionId === question.id); const selected = selectedAnswers[question.id] ?? saved?.answer; const showJustification = selected === "not_applicable"; const justification = justifications[question.id] ?? saved?.justification ?? ""; return <article id={question.id} className={styles.question} key={question.id}><span className={styles.category}>{questionTypeLabel(question.type)}</span><h3>{index + 1}. <b>{question.question[locale]}</b></h3><div className={styles.answers}>{assessmentAnswerValues.map((value) => <button key={value} disabled={!workspaceId} onClick={() => { setSelectedAnswers((current) => ({ ...current, [question.id]: value })); if (value !== "not_applicable") void answer(question.id, value); }} className={`${styles[`answer_${value}`]} ${selected === value ? styles.answerSelected : ""}`}><i />{answerLabel(value, locale)}</button>)}</div>{showJustification && <div className={styles.justification}><label htmlFor={`justification-${question.id}`}>{locale === "fr" ? "Justification requise pour « Non applicable »" : "Required justification for Not applicable"}</label><textarea id={`justification-${question.id}`} value={justification} onChange={(event) => setJustifications((current) => ({ ...current, [question.id]: event.target.value }))} rows={3} disabled={saving === question.id} /><button type="button" disabled={!justification.trim() || saving === question.id} onClick={() => void answer(question.id, "not_applicable")}>{locale === "fr" ? "Enregistrer la justification" : "Save justification"}</button></div>}<QuestionEvidence workspaceId={workspaceId} themeId="organizational" controlId={controlId} questionId={question.id} locale={locale} guidance={question.evidence} /></article>; })}
           {error && workspaceId && <p className={styles.error}>{error}</p>}
         </section>
       </div>

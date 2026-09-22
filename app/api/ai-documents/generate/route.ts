@@ -9,7 +9,7 @@ import { buildCommonDocumentGenerationRequest } from "@/lib/ai/documents/request
 import { buildStructuredDocumentJsonSchema, buildSectionStructuredDocumentJsonSchema, validateStructuredDocumentResponse, validateSectionStructuredDocumentResponse, type StructuredDocumentSection, type StructuredDocumentBlock, type StructuredDocument } from "@/lib/ai/documents/generation-schema";
 import { persistValidatedAiDocumentDraft } from "@/lib/ai/documents/common-validated-draft-persistence";
 import { validateInformationSecurityPolicyLiveQuality } from "@/lib/ai/documents/information-security-policy-live-validation";
-import { AiProviderError, getAiDocumentProvider, OpenAiDocumentProvider } from "@/lib/ai/providers";
+import { AiProviderError, GeminiAiDocumentProvider } from "@/lib/ai/providers";
 import type { AiDocumentGenerationRequest, AiDocumentGenerationResponse, AiDocumentGenerationSection, AiDocumentProvider } from "@/lib/ai/providers/types";
 import { normalizeContext, prepareGenerationContext, workspaceGenerationInput } from "../context";
 import type { DraftPersistenceClient } from "@/lib/ai/documents/validated-draft-persistence";
@@ -145,6 +145,7 @@ async function generateIspSectionBatch(
 
   let retries = 0;
   let lastError: unknown;
+  let retryFeedback: string | undefined;
   while (retries < 2) {
     const attempt = retries + 1;
     tracker.totalProviderCalls++;
@@ -159,6 +160,9 @@ async function generateIspSectionBatch(
     try {
       const response = await provider.generateStructuredDocument({
         ...batchRequest,
+        generationConstraints: retryFeedback
+          ? [...batchRequest.generationConstraints, retryFeedback]
+          : batchRequest.generationConstraints,
         providerOptions: {
           responseSchema: buildStructuredDocumentJsonSchema(batchSpec, "en", spec.label, generation.request.sectionReadiness),
           maxOutputTokens: DEFAULT_BATCH_MAX_OUTPUT_TOKENS,
@@ -241,6 +245,9 @@ async function generateIspSectionBatch(
         finishReason: error instanceof AiProviderError ? error.telemetry?.finishReason ?? null : null,
         detail: error instanceof Error ? error.message.slice(0, 240) : "unknown",
       });
+      if (error instanceof AiProviderError) {
+        retryFeedback = `Previous attempt was rejected during validation. Correct this before returning JSON: ${error.message.slice(0, 300)}`;
+      }
       if (retries >= 2) break;
 
       const waitMs = retryAfterSeconds
@@ -336,10 +343,14 @@ async function generateDocumentFromSections(provider: AiDocumentProvider, spec: 
     let retries = 0;
     let validatedBlocks: StructuredDocumentBlock[] = [];
     let lastError: unknown;
+    let retryFeedback: string | undefined;
 
     while (!success && retries < 3) {
       try {
-        validatedBlocks = await generateDocumentSection(provider, spec, generation.request, sectionReq, tracker);
+        const requestWithFeedback = retryFeedback
+          ? { ...generation.request, generationConstraints: [...generation.request.generationConstraints, retryFeedback] }
+          : generation.request;
+        validatedBlocks = await generateDocumentSection(provider, spec, requestWithFeedback, sectionReq, tracker);
         const structureSpec = spec.sections.find((s: DocumentSectionSpec) => s.id === sectionReq.sectionId)?.structure;
         validateSectionStructure(validatedBlocks, structureSpec);
         validateSemanticWriteGate(validatedBlocks, generation.request.resolvedInputs);
@@ -352,6 +363,9 @@ async function generateDocumentFromSections(provider: AiDocumentProvider, spec: 
         lastError = e;
         retries++;
         if (tracker) tracker.totalRetries++;
+        if (e instanceof AiProviderError) {
+          retryFeedback = `Previous attempt was rejected during validation. Correct this before returning JSON: ${e.message.slice(0, 300)}`;
+        }
         
         let waitMs = 5000;
         if (e instanceof AiProviderError && e.code === "AI_PROVIDER_RATE_LIMITED" && e.retryAfterSeconds) {
@@ -425,8 +439,10 @@ export async function POST(request: Request) {
         "Do not mention AI, prompts, questionnaires, TODOs, placeholders, or ISO certification claims in the policy text.",
       ] : []),
     ] });
-    // ISP is the controlled first migration. Other document types keep the existing provider selection.
-    const provider = documentType === "information_security_policy" ? new OpenAiDocumentProvider() : getAiDocumentProvider();
+    // AI Documents use the dedicated Gemini configuration for every document type.
+    // The generation pipeline below remains unchanged: Gemini returns structured JSON,
+    // then NormCore validates, assembles, and persists the draft.
+    const provider = new GeminiAiDocumentProvider();
     auditProvider = provider.provider;
     
     // TRACKER

@@ -2,6 +2,102 @@
 @media(max-width:1100px){.header{grid-template-columns:150px 1fr auto;padding:0 20px}.header nav a{padding:0 10px}.kpiGrid{grid-template-columns:repeat(3,1fr)}.dashboardGrid,.detailLayout,.settingsWorkspace{grid-template-columns:1fr}.detailMain,.settingsPrimary{border-right:0}.addLayout{grid-template-columns:1fr}.provisionAside{display:none}.settingsSide{display:grid;grid-template-columns:1fr 1fr}.tablePanel{max-width:100%}}
 @media(max-width:760px){.header{grid-template-columns:1fr auto}.header nav{display:none}.profileText{display:none}.main{padding:22px 15px}.pageHeading{align-items:flex-start;flex-direction:column}.kpiGrid{grid-template-columns:repeat(2,1fr)}.dashboardGrid{grid-template-columns:1fr}.filterBar{align-items:stretch;flex-direction:column}.search{min-width:0}.summaryBand,.identityDetails{grid-template-columns:1fr 1fr}.settingsSide{grid-template-columns:1fr}.securityOptions{grid-template-columns:1fr}.organizationForm{padding:25px 20px}}
 .pageHeading h1{font-family:inherit;font-weight:820;letter-spacing:-.035em}
+
+/* Typography-only refinement for laptop readability. The existing visual system,
+   colors, borders, cards and layout dimensions remain unchanged. */
+.header nav{justify-content:center;gap:8px}
+.header nav a{padding:0 16px;font-size:14px;font-weight:600}
+.activeNav:after{right:16px;left:16px}
+.pageHeading h1{font-size:32px;font-weight:700}
+.pageHeading p{font-size:13px}
+.primaryButton,.secondaryButton,.ghostButton,.menuButton{font-size:13px;font-weight:600}
+.panelTitle h2,.sectionHeading h2,.formIntro h2,.provisionAside h2{font-size:18px;font-weight:600}
+.panelTitle p,.sectionHeading p{font-size:12px}
+.kpi small{font-size:11px;font-weight:600}
+.kpi strong{font-size:27px;font-weight:700}
+.badge{font-size:12px;font-weight:600}
+.legend>div{font-size:12px}
+.onboardingChart>div>div{font-size:12px}
+.compactTable strong,.orgName strong{font-size:12px;font-weight:600}
+.compactTable small{font-size:10px}
+.progressText{font-size:12px}
+.timeline strong{font-size:12px;font-weight:600}
+.timeline small,.timeline time{font-size:10px}
+.quickActions a{font-size:12px;font-weight:600}
+.search input,.filterBar select,.dateField input{font-size:12px}
+.dateField{font-size:12px}
+.tablePanel th{font-size:11px;font-weight:600}
+.tablePanel td{font-size:12px}
+.tableFooter{font-size:11px}
+.empty h2{font-size:18px;font-weight:600}
+.empty p{font-size:12px}
+.errorPanel strong{font-size:15px}
+.errorPanel p{font-size:12px}
+.formIntro p,.provisionAside p{font-size:12px}
+.organizationForm label{font-size:13px;font-weight:600}
+.organizationForm input{font-size:13px}
+.inlineError{font-size:12px}
+.successCreation>div:nth-child(2)>span{font-size:11px}
+.successCreation h2{font-size:24px;font-weight:700}
+.successCreation p{font-size:12px}
+.successCreation dt{font-size:11px}
+.successCreation dd{font-size:13px}
+.tokenBox code{font-size:22px}
+.tokenBox button{font-size:12px}
+.notice{font-size:12px}
+.summaryBand span,.accessGrid span{font-size:11px}
+.summaryBand strong{font-size:12px;font-weight:600}
+.accessGrid code{font-size:13px}
+.accessGrid strong{font-size:12px;font-weight:600}
+.organizationActions h2{font-size:16px;font-weight:600}
+.organizationActions>button{font-size:12px;font-weight:600}
+.organizationActions p{font-size:10px}
+.chips button,.settingsTabs button{font-size:12px;font-weight:600}
+.identity h2{font-size:21px;font-weight:600}
+.identity p{font-size:12px}
+.identityDetails span{font-size:10px}
+.identityDetails strong{font-size:12px;font-weight:600}
+.identityDetails small{font-size:10px}
+.securityOptions strong,.preference strong{font-size:12px;font-weight:600}
+.securityOptions small,.preference small{font-size:10px}
+.settingsSide dt{font-size:10px}
+.settingsSide dd{font-size:11px}
+.officialHeading h1{font-size:32px!important;font-weight:700!important}
+.officialHeading p{font-size:13px!important}
+.officialHeading>div:first-child>small{font-size:11px!important}
+.sectionHeading h2{font-size:18px!important;font-weight:600!important}
+.sectionHeading p{font-size:12px!important}
+.activityKpis span{font-size:11px!important}
+.activityKpis strong{font-size:27px!important;font-weight:700!important}
+.activityKpis small{font-size:11px!important}
+.activityFilters>strong,.activityFilters label{font-size:12px!important}
+.activityFilters select{font-size:12px!important}
+.activityTable td{font-size:12px!important}
+.actionName{font-size:12px!important}
+.activityRow strong{font-size:12px!important}
+.activityRow small,.activityRow time{font-size:11px!important}
+.tokenFilters>span,.tokenFilters button{font-size:12px!important}
+.invitationToolbar input,.invitationToolbar select{font-size:12px!important}
+.tokenRowActions>a{font-size:12px!important}
+.directoryToolbar input,.directoryToolbar select{font-size:12px!important}
+.savedViews>span,.savedViews button{font-size:12px!important}
+.directoryTable td{font-size:12px!important}
+.directoryOrg strong{font-size:12px!important}
+.directoryOrg small{font-size:11px!important}
+.directoryProgress>div{font-size:11px!important}
+.main p,.main small,.main time,.main dt,.main dd{font-size:12px!important}
+.main label{font-size:13px!important}
+.main th{font-size:12px!important}
+.main td{font-size:13px!important}
+.main input,.main select,.main textarea{font-size:13px!important}
+.main button{font-size:13px!important}
+.main span{font-size:12px!important}
+.primaryButton,.secondaryButton,.ghostButton,.menuButton,.actionStrip a,.quickActions a,.tokenRowActions button,.rowActions a,.rowActions button,.compactActions>a,.compactActions>button,.organizationActions>button,.notificationPanel button,.settingsTabs button,.chips button,.savedViews button{transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .18s ease}
+.actionStrip a:hover,.quickActions a:hover{background:#eaf7f4;color:#087970;transform:translateY(-1px)}
+.tokenActions .secondaryButton:hover,.successFooter .secondaryButton:hover,.addFooter .secondaryButton:hover{background:#eaf7f4;color:#087970;border-color:#86bdb9}
+.tokenRowActions button:hover,.rowActions a:hover,.rowActions button:hover,.compactActions>a:hover,.compactActions>button:hover{background:#eaf7f4;color:#087970;border-color:#86bdb9}
+.organizationActions>button:hover{background:rgba(25,205,182,.12);color:#72ead7}
+.notificationPanel button:hover,.settingsTabs button:hover,.chips button:hover,.savedViews button:hover{background:#eaf7f4;color:#087970;border-color:#86bdb9}
 .modalLayer{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;background:rgba(4,25,35,.48);backdrop-filter:blur(3px)}.confirmDialog{width:min(100%,450px);padding:27px;border:1px solid #cedddd;border-radius:14px;background:#fff;box-shadow:0 28px 70px rgba(4,27,37,.3);text-align:center}.confirmDialog>span{display:grid;place-items:center;width:48px;height:48px;margin:0 auto 14px;border-radius:14px}.modalDanger{background:#fde9ed;color:#b34961}.modalWarning{background:#e2f6f1;color:#0a8478}.confirmDialog h2{margin:0;color:#0a3039;font-size:19px}.confirmDialog>p{margin:9px auto;color:#587177;font-size:11px;line-height:1.55}.confirmDialog>div:last-child{display:flex;justify-content:flex-end;gap:9px;margin-top:19px}.irreversible{margin-top:15px;padding:11px;border:1px solid #efc5cd;border-radius:8px;background:#fff5f7;color:#914257;font-size:9px;line-height:1.5;text-align:left}.destructiveButton{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:0 14px;border:1px solid #aa425a;border-radius:8px;background:#b94d65;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
 
 .brand{gap:11px;color:#fff;text-decoration:none}.brand span{font-size:20px;font-weight:850;letter-spacing:-.055em}.headerActions{display:flex;align-items:center;gap:16px}.headerIcon{position:relative;display:grid;place-items:center;width:35px;height:35px;border:1px solid rgba(185,220,222,.2);border-radius:9px;background:transparent;color:#a9d6d7}.headerIcon>span{position:absolute;top:-6px;right:-7px;display:grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border:2px solid #061a29;border-radius:999px;background:#19cdb6;color:#062d36;font-size:8px;font-weight:900}.notificationWrap{position:relative}.notificationPanel{position:absolute;top:47px;right:-60px;z-index:70;width:360px;overflow:hidden;border:1px solid #c6dddd;border-radius:12px;background:#fff;box-shadow:0 22px 55px rgba(4,29,39,.25);color:#0b333c}.notificationPanel>div:first-child{display:flex;align-items:center;justify-content:space-between;padding:15px 17px;border-bottom:1px solid #dce7e7;background:#eef8f6}.notificationPanel>div:first-child strong{font-size:12px}.notificationPanel>div:first-child small{color:#527177;font-size:9px}.notificationPanel article{position:relative;display:grid;gap:4px;padding:14px 17px;border-bottom:1px solid #e2ebeb}.notificationPanel article>span{color:#078277;font-size:8px;font-weight:850;letter-spacing:.06em;text-transform:uppercase}.notificationPanel article>strong{font-size:11px}.notificationPanel article>small,.notificationPanel article>time{color:#5b757b;font-size:8px}.notificationPanel article>div{position:absolute;right:14px;bottom:14px;display:flex;gap:6px}.notificationPanel article button{height:27px;padding:0 9px;border:1px solid #c7dada;border-radius:6px;background:#fff;color:#315b62;font-size:8px;font-weight:800}.notificationPanel article button:last-child{border-color:#12bba5;background:#19cdb6;color:#06363a}.notificationPanel article button:disabled{opacity:.5}.notificationPanel>p{margin:0;padding:32px 18px;color:#60787d;font-size:10px;text-align:center}.profileWrap{padding-left:16px;border-left:1px solid rgba(185,220,222,.16)}

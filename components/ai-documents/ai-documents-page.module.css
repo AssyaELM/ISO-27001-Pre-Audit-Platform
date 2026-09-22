@@ -17,7 +17,8 @@
 .crumb{display:flex;gap:14px;align-items:center;color:#224e87;font-size:14px}
 .crumb b{color:#8292a7}
 .profile{display:flex;align-items:center;gap:14px;margin-left:auto;font-size:13px}
-.locale,.activeWorkspace{padding:9px 12px;border:1px solid #dce4eb;border-radius:7px}
+.locale,.activeWorkspace{padding:9px 12px;border:1px solid #dce4eb;border-radius:7px;color:#263b52;font-weight:400}
+.locale{min-width:48px;background:#fff;cursor:pointer}.locale:hover{border-color:#7fbfbd;color:#007f80}
 .activeWorkspace{display:flex;align-items:center;gap:8px}
 .avatar{display:grid;width:34px;height:34px;place-items:center;border-radius:50%;background:#08283d;color:#fff}
 .menu{display:none;border:0;background:transparent}

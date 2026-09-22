@@ -11,7 +11,7 @@ const protectedRoutes = [
   "/dashboard", "/onboarding", "/set-new-password", "/super-admin", "/assessment",
   "/evidence-room", "/ai-documents", "/ai-usage", "/gap-analysis", "/remediation-plan",
 ];
-const publicApiRoutes = ["/api/auth/", "/api/activation/verify", "/api/activation/password"];
+const publicApiRoutes = ["/api/auth/", "/api/activation/verify", "/api/activation/password", "/api/onboarding/"];
 const localAuthCookie = "normcore-local-auth";
 const localAuthEmailCookie = "normcore-local-auth-email";
 const localWorkspaceMetadataCookie = "normcore-local-workspace-metadata";
@@ -59,7 +59,15 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  const { data, error } = await supabase.auth.getUser(bearer);
+  let data: { user: any } = { user: null };
+  let error: any = null;
+  try {
+    const res = await supabase.auth.getUser(bearer);
+    data = res.data;
+    error = res.error;
+  } catch (err) {
+    error = err;
+  }
   // If the network-backed user lookup is temporarily unavailable, an already
   // established Supabase session still contains the signed-in user metadata.
   // Use it for routing so a valid browser session is not sent back to login.
@@ -86,10 +94,20 @@ export async function updateSession(request: NextRequest) {
       global: { headers: { Authorization: `Bearer ${sessionToken}` } },
       auth: { persistSession: false, autoRefreshToken: false },
     }) : supabase;
-    const [{ data: roleResult }, { data: accessResult, error: accessError }] = await Promise.all([
-      authorizationClient.rpc("current_user_is_super_admin"),
-      authorizationClient.rpc("current_user_access_request_status"),
-    ]);
+    let roleResult = null;
+    let accessResult = null;
+    let accessError: any = null;
+    try {
+      const [res1, res2] = await Promise.all([
+        authorizationClient.rpc("current_user_is_super_admin"),
+        authorizationClient.rpc("current_user_access_request_status"),
+      ]);
+      roleResult = res1.data;
+      accessResult = res2.data;
+      accessError = res2.error;
+    } catch (err) {
+      accessError = err;
+    }
     isSuperAdmin = roleResult === true;
     accessRequestStatus = typeof accessResult === "string" ? accessResult : "legacy";
     accessStatusError = Boolean(accessError);

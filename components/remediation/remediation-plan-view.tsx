@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { useStoredLanguage } from "@/components/language-preference";
+import { LanguageToggle } from "@/components/language-toggle";
 import { AppSidebar } from "@/components/navigation/app-sidebar";
 import { workspaceDisplayName } from "@/lib/workspaces/display-name";
 import { readBrowserWorkspaceContext } from "@/lib/workspaces/browser-context";
@@ -171,20 +172,20 @@ export default function RemediationPlanView({ /* eslint-disable-next-line @types
 
   const clearFilters = () => { setQuery(""); setOwner("all"); setStatus("all"); setDue("all"); };
   return <main className={styles.shell} style={{ "--navy": "#03192b", "--sidebar-width": "clamp(218px, 16vw, 267px)" } as CSSProperties}>
-    <button className={styles.mobileMenu} onClick={() => setMobileOpen(true)} aria-label="Open navigation"><Menu size={23} /></button>
-    {mobileOpen && <button className={styles.scrim} onClick={() => setMobileOpen(false)} aria-label="Close navigation" />}
+    <button className={styles.mobileMenu} onClick={() => setMobileOpen(true)} aria-label={fr ? "Ouvrir la navigation" : "Open navigation"}><Menu size={23} /></button>
+    {mobileOpen && <button className={styles.scrim} onClick={() => setMobileOpen(false)} aria-label={fr ? "Fermer la navigation" : "Close navigation"} />}
     <AppSidebar organization={profile.organization} workspaceId={profile.workspaceId} mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
 
     <section className={styles.page}>
       <header className={styles.topbar}>
         <div className={styles.breadcrumb}><span>{profile.organization}</span><b>/</b><strong>{fr ? "Plan de remédiation" : "Remediation Plan"}</strong></div>
-        <div className={styles.account}><span className={styles.language}>EN / FR</span><span className={styles.workspaceState}><i />{fr ? "Espace actif" : "Workspace active"}</span><span className={styles.userName}>{profile.name}</span><ChevronDown size={15} /><span className={styles.avatar}>{profile.name.slice(0, 1).toUpperCase() || "N"}</span></div>
+        <div className={styles.account}><LanguageToggle className={styles.language} /><span className={styles.workspaceState}><i />{fr ? "Espace actif" : "Workspace active"}</span><span className={styles.userName}>{profile.name}</span><ChevronDown size={15} /><span className={styles.avatar}>{profile.name.slice(0, 1).toUpperCase() || "N"}</span></div>
       </header>
 
       <section className={styles.board}>
         <h1>{fr ? "Plan de remédiation" : "Remediation Plan"}</h1>
         {error && <p className={styles.error} role="alert">{error}</p>}
-        <section className={styles.kpis} aria-label="Remediation metrics">
+        <section className={styles.kpis} aria-label={fr ? "Indicateurs de remédiation" : "Remediation metrics"}>
           <article><span className={styles.kpiTeal}><ClipboardCheck /></span><div><small>{fr ? "Actions ouvertes" : "Open actions"}</small><strong>{metrics.open}</strong></div></article>
           <article><span className={styles.kpiBlue}><ListChecks /></span><div><small>{fr ? "À faire" : "To do"}</small><strong>{metrics.todo}</strong></div></article>
           <article><span className={styles.kpiBlue}><RefreshCw /></span><div><small>{fr ? "En cours" : "In progress"}</small><strong>{metrics.inProgress}</strong></div></article>
@@ -192,18 +193,18 @@ export default function RemediationPlanView({ /* eslint-disable-next-line @types
           <article><span className={styles.kpiRed}><CalendarDays /></span><div><small>{fr ? "En retard" : "Overdue"}</small><strong>{metrics.overdue}</strong></div></article>
         </section>
 
-        <section className={styles.filters} aria-label="Remediation filters">
+        <section className={styles.filters} aria-label={fr ? "Filtres de remédiation" : "Remediation filters"}>
           <label className={styles.search}><Search size={18} /><input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder={fr ? "Rechercher une remédiation" : "Search remediation"} /></label>
-          <label className={styles.select}><select aria-label="Owner" value={owner} onChange={(event) => { setOwner(event.target.value); setPage(1); }}><option value="all">{fr ? "Tous les responsables" : "All owners"}</option><option value="unassigned">{fr ? "Non attribué" : "Unassigned"}</option>{members.map((member) => <option value={member.id} key={member.id}>{member.name}</option>)}</select><ChevronDown size={16} /></label>
-          <label className={styles.select}><select aria-label="Status" value={status} onChange={(event) => { setStatus(event.target.value as StatusFilter); setPage(1); }}><option value="all">{fr ? "Tous les statuts" : "All statuses"}</option><option value="todo">{fr ? "À faire" : "To do"}</option><option value="in_progress">{fr ? "En cours" : "In progress"}</option><option value="completed">{fr ? "Terminée" : "Completed"}</option><option value="overdue">{fr ? "En retard" : "Overdue"}</option></select><ChevronDown size={16} /></label>
-          <label className={styles.select}><select aria-label="Due date" value={due} onChange={(event) => { setDue(event.target.value as DueFilter); setPage(1); }}><option value="all">{fr ? "Toutes les échéances" : "Due date"}</option><option value="overdue">{fr ? "En retard" : "Overdue"}</option><option value="scheduled">{fr ? "Planifiée" : "Scheduled"}</option><option value="unscheduled">{fr ? "Sans échéance" : "No due date"}</option></select><ChevronDown size={16} /></label>
+          <label className={styles.select}><select aria-label={fr ? "Responsable" : "Owner"} value={owner} onChange={(event) => { setOwner(event.target.value); setPage(1); }}><option value="all">{fr ? "Tous les responsables" : "All owners"}</option><option value="unassigned">{fr ? "Non attribué" : "Unassigned"}</option>{members.map((member) => <option value={member.id} key={member.id}>{member.name}</option>)}</select><ChevronDown size={16} /></label>
+          <label className={styles.select}><select aria-label={fr ? "Statut" : "Status"} value={status} onChange={(event) => { setStatus(event.target.value as StatusFilter); setPage(1); }}><option value="all">{fr ? "Tous les statuts" : "All statuses"}</option><option value="todo">{fr ? "À faire" : "To do"}</option><option value="in_progress">{fr ? "En cours" : "In progress"}</option><option value="completed">{fr ? "Terminée" : "Completed"}</option><option value="overdue">{fr ? "En retard" : "Overdue"}</option></select><ChevronDown size={16} /></label>
+          <label className={styles.select}><select aria-label={fr ? "Échéance" : "Due date"} value={due} onChange={(event) => { setDue(event.target.value as DueFilter); setPage(1); }}><option value="all">{fr ? "Toutes les échéances" : "Due date"}</option><option value="overdue">{fr ? "En retard" : "Overdue"}</option><option value="scheduled">{fr ? "Planifiée" : "Scheduled"}</option><option value="unscheduled">{fr ? "Sans échéance" : "No due date"}</option></select><ChevronDown size={16} /></label>
           <button className={styles.clear} onClick={clearFilters}><SlidersHorizontal size={17} />{fr ? "Effacer les filtres" : "Clear filters"}</button>
         </section>
 
         <section className={styles.tablePanel}>
           <header><h2>{fr ? "Actions de remédiation" : "Remediation actions"} <span>{filtered.length}</span></h2></header>
           <div className={styles.tableScroll}>
-            <div className={styles.tableHeader}><span>{fr ? "Remédiation" : "Remediation"}</span><span>{fr ? "Contrôle" : "Control"}</span><span>Gap</span><span>Owner</span><span>{fr ? "Échéance" : "Due date"}</span><span>Status</span><span /></div>
+            <div className={styles.tableHeader}><span>{fr ? "Remédiation" : "Remediation"}</span><span>{fr ? "Contrôle" : "Control"}</span><span>Gap</span><span>{fr ? "Responsable" : "Owner"}</span><span>{fr ? "Échéance" : "Due date"}</span><span>{fr ? "Statut" : "Status"}</span><span /></div>
             {visible.map((action) => {
               const member = action.ownerUserId ? memberById.get(action.ownerUserId) : undefined;
               const overdue = isOverdue(action);
@@ -244,13 +245,13 @@ export default function RemediationPlanView({ /* eslint-disable-next-line @types
         <div className={styles.modalControl}><span className={styles.modalThemeIcon}><ThemeIcon theme={selected.theme} size={28} /></span><div><h3>{selected.controlCode} {selected.controlTitle}</h3><p><span>{themeLabel(selected.theme, fr)}</span><b className={selected.gapLevel === "full_gap" ? styles.fullGap : styles.partialGap}>{selected.gapLevel === "full_gap" ? (fr ? "Gap complet" : "Full gap") : (fr ? "Gap partiel" : "Partial gap")}</b></p></div></div>
         <dl className={styles.modalFields}>
           <div><dt>{fr ? "Action de remédiation" : "Remediation action"}</dt><dd>{actionTitle(selected, fr)}</dd></div>
-          <div><dt>Owner</dt><dd><select value={selected.ownerUserId ?? ""} disabled={saving} onChange={(event) => void updateAction(selected.id, { ownerUserId: event.target.value || null })}><option value="">{fr ? "Non attribué" : "Unassigned"}</option>{members.map((member) => <option value={member.id} key={member.id}>{member.name}</option>)}</select></dd></div>
+          <div><dt>{fr ? "Responsable" : "Owner"}</dt><dd><select value={selected.ownerUserId ?? ""} disabled={saving} onChange={(event) => void updateAction(selected.id, { ownerUserId: event.target.value || null })}><option value="">{fr ? "Non attribué" : "Unassigned"}</option>{members.map((member) => <option value={member.id} key={member.id}>{member.name}</option>)}</select></dd></div>
           <div><dt>{fr ? "Échéance" : "Due date"}</dt><dd><input type="date" value={dueDraft} disabled={saving} onChange={(event) => { const value = event.target.value; setDueDraft(value); void updateAction(selected.id, { dueDate: value || null }); }} /></dd></div>
-          <div><dt>Status</dt><dd className={styles.segmented}>{(["todo", "in_progress", "completed"] as const).map((value) => <button className={selected.status === value ? styles.segmentActive : ""} disabled={saving} onClick={() => void updateAction(selected.id, { status: value })} key={value}>{statusLabel(value, fr)}</button>)}</dd></div>
+          <div><dt>{fr ? "Statut" : "Status"}</dt><dd className={styles.segmented}>{(["todo", "in_progress", "completed"] as const).map((value) => <button className={selected.status === value ? styles.segmentActive : ""} disabled={saving} onClick={() => void updateAction(selected.id, { status: value })} key={value}>{statusLabel(value, fr)}</button>)}</dd></div>
           <div><dt>{fr ? "Note de progression" : "Progress note"}</dt><dd><textarea key={`${selected.id}:${selected.updatedAt}`} defaultValue={selected.progressNote} disabled={saving} rows={3} placeholder={fr ? "Ajouter une note de suivi" : "Add a progress note"} onBlur={(event) => { if (event.target.value.trim() !== selected.progressNote) void updateAction(selected.id, { progressNote: event.target.value }); }} /></dd></div>
         </dl>
         <div className={styles.evidenceRow}><strong>{fr ? "Preuve" : "Evidence"}</strong><span><Paperclip size={17} />{selected.evidenceStatus === "provided" ? (fr ? "Référence de preuve fournie dans Assessment" : "Evidence reference provided in Assessment") : (fr ? "Aucune preuve référencée" : "No evidence referenced")}</span></div>
-        <div className={styles.sourceRow}><strong>Source</strong><Link prefetch={true} href={selected.gapHref}>{fr ? "Voir le gap" : "View gap"}</Link><i /><Link prefetch={true} href={selected.assessmentHref}><ExternalLink size={15} />{fr ? "Voir le contrôle" : "View control"}</Link></div>
+        <div className={styles.sourceRow}><strong>{fr ? "Source" : "Source"}</strong><Link prefetch={true} href={selected.gapHref}>{fr ? "Voir le gap" : "View gap"}</Link><i /><Link prefetch={true} href={selected.assessmentHref}><ExternalLink size={15} />{fr ? "Voir le contrôle" : "View control"}</Link></div>
         {selected.status === "completed" && <p className={styles.reassessNote}><RefreshCw />{fr ? "Confirmez la correction dans Assessment pour recalculer ce gap." : "Confirm the correction in Assessment to recalculate this gap."}</p>}
         <footer><button onClick={() => setSelectedId("")}>{fr ? "Fermer" : "Close"}</button>{selected.status === "completed" && <Link prefetch={true} href={selected.assessmentHref}>{fr ? "Réévaluer le contrôle" : "Reassess control"}</Link>}</footer>
       </section>

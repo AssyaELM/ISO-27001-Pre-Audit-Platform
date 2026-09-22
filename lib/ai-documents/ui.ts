@@ -49,7 +49,7 @@ export function readinessPercent(preparation: AiDocumentPreparation): number {
 
 export function safeGenerationError(code?: string): string {
   if (code === "AI_PROVIDER_TIMEOUT") return "Generation took too long. No draft was saved.";
-  if (code === "AI_PROVIDER_RATE_LIMITED") return "Groq rate limit reached. Please wait for the provider limit to reset, then retry. No draft was saved.";
+  if (code === "AI_PROVIDER_RATE_LIMITED") return "AI provider rate limit reached. Please wait and retry. No draft was saved.";
   if (code === "AI_PROVIDER_BAD_RESPONSE") return "The generated content did not pass validation. No draft was saved.";
   if (code === "AI_DOCUMENT_WRITE_GATE_FAILED") return "The generated draft contained information that could not be verified. No document was saved.";
   if (code === "AI_DOCUMENT_PERSISTENCE_FAILED") return "The draft was generated but could not be saved to the registry.";

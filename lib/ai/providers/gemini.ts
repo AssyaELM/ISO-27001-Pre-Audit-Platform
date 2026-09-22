@@ -44,6 +44,39 @@ export class GeminiAiDocumentProvider implements AiDocumentProvider {
   // Convert generic JSON Schema to Gemini Schema
   private mapSchemaToGemini(schema: Record<string, unknown>): Record<string, unknown> {
     const geminiSchema = { ...schema };
+
+    // Gemini's responseSchema supports a useful subset of JSON Schema. The
+    // application still performs the complete validation after the response,
+    // so these restrictions only adapt the provider-facing schema.
+    delete geminiSchema.additionalProperties;
+    delete geminiSchema.$schema;
+    delete geminiSchema.const;
+    delete geminiSchema.minItems;
+    delete geminiSchema.maxItems;
+
+    // Gemini does not support tuple validation (`prefixItems`). Convert the
+    // generated tuple into one item schema while preserving the allowed
+    // section ids/titles/statuses as enums. The canonical validator remains
+    // authoritative for exact order and section count.
+    if (Array.isArray(schema.prefixItems)) {
+      const tupleItems = schema.prefixItems.filter((item): item is Record<string, unknown> => Boolean(item && typeof item === "object"));
+      const firstItem = tupleItems[0] ? this.mapSchemaToGemini(tupleItems[0]) : { type: "OBJECT" };
+      const properties = (firstItem.properties && typeof firstItem.properties === "object")
+        ? { ...(firstItem.properties as Record<string, unknown>) }
+        : {};
+
+      for (const key of ["sectionId", "title", "status"]) {
+        const constants = tupleItems
+          .map((item) => (item.properties && typeof item.properties === "object" ? (item.properties as Record<string, unknown>)[key] : undefined))
+          .map((property) => property && typeof property === "object" ? (property as Record<string, unknown>).const : undefined)
+          .filter((value): value is string => typeof value === "string");
+        if (constants.length) properties[key] = { type: "STRING", enum: [...new Set(constants)] };
+      }
+
+      geminiSchema.items = { ...firstItem, type: "OBJECT", properties };
+      delete geminiSchema.prefixItems;
+    }
+
     if (typeof geminiSchema.type === "string") {
       geminiSchema.type = geminiSchema.type.toUpperCase();
     }
@@ -58,10 +91,6 @@ export class GeminiAiDocumentProvider implements AiDocumentProvider {
       geminiSchema.items = this.mapSchemaToGemini(geminiSchema.items as Record<string, unknown>);
     }
     
-    // Gemini does not support these standard JSON schema keywords
-    delete geminiSchema.additionalProperties;
-    delete geminiSchema.$schema;
-    
     if (Array.isArray(geminiSchema.enum)) {
       if (geminiSchema.enum.some((e) => typeof e !== "string")) {
         delete geminiSchema.enum;
@@ -75,7 +104,7 @@ export class GeminiAiDocumentProvider implements AiDocumentProvider {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(this.model)}:generateContent`;
       
       const contents = [];
       let systemInstruction = undefined;
@@ -101,7 +130,7 @@ export class GeminiAiDocumentProvider implements AiDocumentProvider {
 
       const response = await this.fetchImpl(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-goog-api-key": this.apiKey },
         body: JSON.stringify({
           systemInstruction,
           contents,
@@ -141,7 +170,7 @@ export class GeminiAiDocumentProvider implements AiDocumentProvider {
       try { body = JSON.parse(responseText); }
       catch { throw new AiProviderError("AI_PROVIDER_BAD_RESPONSE", "AI provider returned malformed JSON.", response.status); }
 
-      const content = body.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+      const content = body.candidates?.[0]?.content?.parts?.map((part: { text?: string }) => part.text ?? "").join("") ?? "";
 
       return {
         provider: this.provider,

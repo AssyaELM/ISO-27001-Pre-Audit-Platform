@@ -104,6 +104,31 @@ function text(value: unknown, locale: GapAnalysisLocale): string {
   const localized = object(value);
   return typeof localized[locale] === "string" ? localized[locale] as string : typeof localized.en === "string" ? localized.en : "";
 }
+const dynamicGapTranslations: Record<string, { en: string; fr: string }> = {
+  "Registre/procédure non maintenu ou sans preuve.": {
+    en: "Register or procedure is not maintained, or no evidence is available.",
+    fr: "Registre/procédure non maintenu ou sans preuve.",
+  },
+  "Établir cycle de vérification et documenter les résultats.": {
+    en: "Establish a verification cycle and document the results.",
+    fr: "Établir cycle de vérification et documenter les résultats.",
+  },
+};
+function containsFrenchText(value: string) {
+  return /[àâçéèêëîïôùûüÿœæÀÂÇÉÈÊËÎÏÔÙÛÜŸŒÆ]|(?:\b(?:aucun|aucune|preuve|preuves|registre|procédure|établir|définir|compléter|mettre|maintenu|revue|traçabilité|existant|incomplet|manquant|manquante|organisation|contrôle|sécurité)\b)/i.test(value);
+}
+function dynamicGapText(value: string | undefined, locale: GapAnalysisLocale, kind: "diagnostic" | "remediation", gapCode?: string) {
+  if (!value) return undefined;
+  const known = dynamicGapTranslations[value]?.[locale];
+  if (known) return known;
+  if (locale === "en" && containsFrenchText(value)) {
+    const code = gapCode ? ` (${gapCode})` : "";
+    return kind === "diagnostic"
+      ? `Gap identified${code}. Review the related control evidence and assessment response.`
+      : `Recommended remediation${code}. Define the missing control activity, assign ownership, and retain evidence of completion.`;
+  }
+  return value;
+}
 function evidenceStatus(row: GapAnalysisResponse): GapAnalysisEvidenceStatus {
   return row.hasCanonicalEvidence ? "provided" : "not_provided";
 }
@@ -284,7 +309,23 @@ function item(row: GapAnalysisResponse, theme: GapAnalysisTheme, controlId: stri
   if (!status) return null;
   const derived = deriveAssessmentOutcome(asResponseInput(row));
   if (!derived.isValid) return null;
-  return { id: `${theme}:${controlId}:${row.questionId}`, theme, controlId, controlCode, controlTitle, questionId: row.questionId, question: text(question.question, locale), answer: row.answer, status, evidenceStatus: evidenceStatus(row), href: `/assessment/${theme}/${controlId}#${row.questionId}`, ...extra };
+  const gapCode = extra.gapCode;
+  return {
+    id: `${theme}:${controlId}:${row.questionId}`,
+    theme,
+    controlId,
+    controlCode,
+    controlTitle,
+    questionId: row.questionId,
+    question: text(question.question, locale),
+    answer: row.answer,
+    status,
+    evidenceStatus: evidenceStatus(row),
+    href: `/assessment/${theme}/${controlId}#${row.questionId}`,
+    ...extra,
+    diagnostic: dynamicGapText(extra.diagnostic, locale, "diagnostic", gapCode),
+    remediation: dynamicGapText(extra.remediation, locale, "remediation", gapCode),
+  };
 }
 
 export function deriveGapAnalysis(responses: GapAnalysisResponse[], onboarding: Record<string, unknown> = {}, locale: GapAnalysisLocale = "en"): GapAnalysisItem[] {
