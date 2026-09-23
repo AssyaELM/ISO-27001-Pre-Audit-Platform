@@ -1,12 +1,7 @@
 # NormCore
 
 <p align="center">
-  <img src="docs/assets/dashboard-overview.png" alt="NormCore Dashboard" width="48%">
-  <img src="docs/assets/assessment-questionnaire.png" alt="ISO 27001 Assessment" width="48%">
-</p>
-<p align="center">
-  <img src="docs/assets/remediation-plan.png" alt="Remediation Plan" width="48%">
-  <img src="docs/assets/ai-assistant.png" alt="AI Policy Assistant" width="48%">
+  <img src="docs/assets/landing-page.png" alt="NormCore Landing Page" width="100%">
 </p>
 
 ## 1. What is NormCore?
@@ -19,6 +14,10 @@ NormCore (formerly known as CapISO) is a comprehensive web platform designed to 
 - **Evidence Room**: A centralized repository to upload and link proofs of compliance directly to controls.
 - **AI Document Generation**: Automated drafting of mandatory ISO 27001 policies using organizational context.
 - **Super Admin Dashboard**: Centralized management of organizations, access requests, and platform activity.
+
+<p align="center">
+  <img src="docs/assets/dashboard-overview.png" alt="NormCore Dashboard Overview" width="100%">
+</p>
 
 ## 3. Technology Stack
 - **Framework**: Next.js 15 (App Router)
@@ -85,6 +84,10 @@ Authentication is managed via Supabase Auth with Server-Side Rendering (SSR) sup
 - Session tokens are stored in HTTP-only cookies.
 - Ensure your local hostname (e.g., `http://127.0.0.1:3103`) is added to your Supabase project's allowed redirect URIs.
 
+<p align="center">
+  <img src="docs/assets/login-screen.png" alt="NormCore Login Screen" width="70%">
+</p>
+
 ## 13. Running the Application Locally
 Start the development server:
 ```bash
@@ -121,17 +124,38 @@ Remember to apply your Supabase database migrations to your production instance 
 
 ## 17. Main User Workflows
 1. **Onboarding**: Users define their organization's scope and context.
+   <br>
+   <p align="center">
+     <img src="docs/assets/onboarding-owner.png" alt="Onboarding Owner" width="48%">
+     <img src="docs/assets/onboarding-company-size.png" alt="Onboarding Company Size" width="48%">
+   </p>
 2. **Assessment**: Users answer guided ISO 27001 questions.
+   <br>
+   <p align="center">
+     <img src="docs/assets/assessment-questionnaire.png" alt="Assessment Controls" width="90%">
+   </p>
 3. **Gap Analysis**: The system calculates compliance gaps automatically.
 4. **Remediation**: Users plan and assign tasks to fix gaps.
+   <br>
+   <p align="center">
+     <img src="docs/assets/remediation-plan.png" alt="Remediation Plan" width="90%">
+   </p>
 5. **Evidence Room**: Users upload proofs of compliance.
 6. **AI Documents**: Users generate compliant security policies based on their unique context.
+   <br>
+   <p align="center">
+     <img src="docs/assets/ai-assistant.png" alt="AI Policy Assistant" width="90%">
+   </p>
 
 ## 18. Super Admin Workflows
 The Super Admin dashboard (`/super-admin`) is strictly isolated and allows administrators to:
 - Review and approve/reject user access requests.
 - Provision new organizations and workspaces.
 - Monitor global platform activity and AI token usage.
+
+<p align="center">
+  <img src="docs/assets/super-admin-dashboard.png" alt="Super Admin Dashboard" width="100%">
+</p>
 
 ## 19. Security Considerations
 - **Data Isolation**: Multi-tenancy is strictly enforced at the database level using PostgreSQL Row Level Security (RLS) policies. Users can only access data tied to their specific `workspace_id`.
