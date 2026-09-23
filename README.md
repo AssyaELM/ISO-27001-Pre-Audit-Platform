@@ -135,12 +135,20 @@ Remember to apply your Supabase database migrations to your production instance 
      <img src="docs/assets/assessment-questionnaire.png" alt="Assessment Controls" width="90%">
    </p>
 3. **Gap Analysis**: The system calculates compliance gaps automatically.
+   <br>
+   <p align="center">
+     <img src="docs/assets/gap-analysis.png" alt="Gap Analysis" width="90%">
+   </p>
 4. **Remediation**: Users plan and assign tasks to fix gaps.
    <br>
    <p align="center">
      <img src="docs/assets/remediation-plan.png" alt="Remediation Plan" width="90%">
    </p>
 5. **Evidence Room**: Users upload proofs of compliance.
+   <br>
+   <p align="center">
+     <img src="docs/assets/evidence-room.png" alt="Evidence Room" width="90%">
+   </p>
 6. **AI Documents**: Users generate compliant security policies based on their unique context.
    <br>
    <p align="center">
