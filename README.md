@@ -72,7 +72,7 @@ The Super Admin dashboard (`/super-admin`) is strictly isolated and allows admin
 
 ---
 
-# 💻 Developer Guide: Reproducing the Project
+#  Developer Guide: Reproducing the Project
 
 The following sections detail how to clone, configure, build, and deploy NormCore from scratch.
 
