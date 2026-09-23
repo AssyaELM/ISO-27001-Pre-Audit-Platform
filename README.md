@@ -1,5 +1,14 @@
 # NormCore
 
+<p align="center">
+  <img src="docs/assets/dashboard-overview.png" alt="NormCore Dashboard" width="48%">
+  <img src="docs/assets/assessment-questionnaire.png" alt="ISO 27001 Assessment" width="48%">
+</p>
+<p align="center">
+  <img src="docs/assets/remediation-plan.png" alt="Remediation Plan" width="48%">
+  <img src="docs/assets/ai-assistant.png" alt="AI Policy Assistant" width="48%">
+</p>
+
 ## 1. What is NormCore?
 NormCore (formerly known as CapISO) is a comprehensive web platform designed to facilitate ISO 27001 pre-audits. It provides organizations with a guided pathway to assess their security posture, identify gaps, plan remediations, and automatically generate required compliance documentation.
 
