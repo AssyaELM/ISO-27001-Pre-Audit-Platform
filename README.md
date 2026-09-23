@@ -81,14 +81,20 @@ The following sections detail how to clone, configure, build, and deploy NormCor
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS and CSS Modules
 - **Database & Backend**: Supabase (PostgreSQL)
-- **AI Integration**: Gemini, OpenAI, Groq, OpenRouter
+- **AI Integration**: Google Gemini (primary provider). The project structure also supports additional AI providers where configured.
 
-## 6. Project Architecture
+## 6. Repository Structure
 The project follows a modular, domain-driven design pattern built upon the Next.js App Router.
-- `app/`: Routing, page components, and API endpoints.
-- `components/`: Reusable React components organized by feature domain.
-- `lib/`: Core business logic, Supabase clients, and AI provider integrations.
-- `supabase/`: Database migrations, schema definitions, and RLS policies.
+- `app/`: Next.js routes, pages and API endpoints.
+- `components/`: Reusable UI and feature components.
+- `content/`: Application content and ISO-related content.
+- `docs/`: Technical and project documentation.
+- `lib/`: Business logic, Supabase and AI integrations.
+- `public/`: Public static assets.
+- `scripts/`: Project utility and validation scripts.
+- `supabase/`: Database migrations and configuration.
+- `tests/`: Automated tests.
+
 See [Architecture Documentation](docs/ARCHITECTURE.md) for more details.
 
 ## 7. Prerequisites
@@ -139,16 +145,24 @@ Other providers (OpenAI, Groq, OpenRouter) can be configured similarly.
 ## 14. Authentication Setup
 Authentication is managed via Supabase Auth with Server-Side Rendering (SSR) support.
 - Session tokens are stored in HTTP-only cookies.
-- Ensure your local hostname (e.g., `http://127.0.0.1:3103`) is added to your Supabase project's allowed redirect URIs.
+- Ensure your local hostname (e.g., `http://127.0.0.1:3103` or `http://localhost:3000`) is added to your Supabase project's allowed redirect URIs.
 
 ## 15. Running the Application Locally
 Start the development server:
 ```bash
 npm run dev
 ```
-The application will be accessible at the URL defined by `NEXT_PUBLIC_APP_URL` in your `.env.local` (default: `http://127.0.0.1:3103`).
+The application will be accessible at the URL defined by `NEXT_PUBLIC_APP_URL` in your `.env.local` (default: `http://127.0.0.1:3103`). If you run the app on a different port (e.g., `http://localhost:3000`), ensure `NEXT_PUBLIC_APP_URL` and your Supabase redirect URLs are updated to match.
 
-## 16. Running Typecheck, Lint and Build
+## 16. First-Time Verification
+After starting the application, you can verify your local setup by following these steps:
+1. Open the local URL in your browser.
+2. Create an organization account or use an existing test account.
+3. Complete the onboarding flow.
+4. Create or open an assessment workspace.
+5. Verify that the Assessment, Gap Analysis, Remediation Plan, Evidence Room, and AI Documents modules are accessible.
+
+## 17. Running Typecheck, Lint and Build
 To validate the codebase integrity, run the following commands:
 ```bash
 # Verify TypeScript typings
@@ -161,12 +175,12 @@ npm run lint
 npm run build
 ```
 
-## 17. Running Tests / Playwright
-NormCore includes integration and UI tests in the `scripts/` directory.
-- Test scripts can be executed via Node (e.g., `node scripts/assessment-rls-integration-test.mjs`).
-- If Playwright tests are configured, ensure browsers are installed: `npx playwright install`.
+## 18. Running Tests / Playwright
+NormCore includes automated tests in the `tests/` directory, while `scripts/` contains utility and validation scripts.
+- Utility/validation scripts can be executed via Node (e.g., `node scripts/assessment-rls-integration-test.mjs`).
+- Automated UI tests are configured via `playwright.config.js`. Ensure browsers are installed before running them: `npx playwright install`.
 
-## 18. Production Build and Deployment
+## 19. Production Build and Deployment
 NormCore is optimized for deployment on Vercel or any standard Node.js hosting environment.
 ```bash
 npm install --production
@@ -175,17 +189,17 @@ npm start
 ```
 Remember to apply your Supabase database migrations to your production instance before starting the server.
 
-## 19. Security Considerations
+## 20. Security Considerations
 - **Data Isolation**: Multi-tenancy is strictly enforced at the database level using PostgreSQL Row Level Security (RLS) policies. Users can only access data tied to their specific `workspace_id`.
 - **Secret Management**: Never hardcode API keys or the `SUPABASE_SERVICE_ROLE_KEY`. They must remain in server-side environment variables.
 - **Authentication**: Rely entirely on the Supabase SSR cookie implementation provided in `lib/supabase/`.
 
-## 20. Troubleshooting
+## 21. Troubleshooting
 - **Build Errors**: Ensure you are running Node.js v18.18.0 or higher.
 - **Authentication Failures**: Verify your Supabase URL, Anon Key, and redirect URIs in both `.env.local` and the Supabase dashboard.
 - **Database Access Issues**: Verify that your `SUPABASE_SERVICE_ROLE_KEY` is correct, and that migrations have been successfully applied.
 
-## 21. Detailed Documentation Links
+## 22. Detailed Documentation Links
 For deep dives into specific subsystems, consult the `docs/` directory:
 - [Architecture](docs/ARCHITECTURE.md)
 - [Database & Migrations](docs/DATABASE.md)
